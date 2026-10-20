@@ -75,7 +75,7 @@
       </select>
     </label>
 
-    <label class="field">
+    <label class="field field-wide">
       <span class="label">Play</span>
       <select name="play">
         <option value="">Any play</option>
@@ -83,11 +83,15 @@
       </select>
     </label>
 
-    <label class="field">
+    <label class="field field-wide">
       <span class="label">Signal</span>
       <select name="tag">
         <option value="">Any signal</option>
-        {% for t in tag_options %}<option value="{{ t.key }}" {% if filters.tag == t.key %}selected{% endif %}>{{ t.label }} ({{ t.count }})</option>{% endfor %}
+        {% for group, items in tag_options | groupby("group") | sort(reverse=true) %}
+        <optgroup label="{{ group }}">
+          {% for t in items %}<option value="{{ t.key }}" {% if filters.tag == t.key %}selected{% endif %}>{{ t.label }} ({{ t.count }})</option>{% endfor %}
+        </optgroup>
+        {% endfor %}
       </select>
     </label>
 

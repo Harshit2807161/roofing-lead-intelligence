@@ -253,9 +253,9 @@ def tag_options(session: Session) -> list[dict[str, Any]]:
         for key in {k for t in row["tags"] for k in t["keys"]}:
             counts[key] = counts.get(key, 0) + 1
     order = lambda k: (k.startswith("trade:"), -counts[k], k)  # noqa: E731 - signals first, then trades
-    return [
-        {"key": k, "label": tag_label(k), "count": counts[k]} for k in sorted(counts, key=order)
-    ]
+    return [{"key": k, "label": tag_label(k), "count": counts[k],
+             "group": "Other trades" if k.startswith("trade:") else "Signals from reviews and About"}
+            for k in sorted(counts, key=order)]  # fmt: skip
 
 
 def summary_counts(session: Session) -> dict[str, Any]:

@@ -325,7 +325,8 @@ input[type="search"]:focus, select:focus { border-color: var(--accent); outline:
 .list-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
 .filters {
   position: static; padding: 14px 16px; gap: 12px 14px; align-items: end;
-  grid-template-columns: minmax(190px, 1.5fr) auto repeat(6, minmax(110px, 1fr));
+  /* name | state | distance, rating, score | play | signal | sort: play and signal hold long labels */
+  grid-template-columns: minmax(180px, 1.4fr) auto repeat(3, minmax(100px, 0.8fr)) minmax(170px, 1.2fr) minmax(220px, 1.5fr) minmax(120px, 0.9fr);
 }
 .filters-foot { grid-column: 1 / -1; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
   padding-top: 10px; border-top: 1px solid var(--border-soft); }
@@ -419,3 +420,34 @@ input[type="search"]:focus, select:focus { border-color: var(--accent); outline:
 .chat-suggest { display: flex; gap: 6px; flex-wrap: wrap; }
 .chat-suggest form { margin: 0; }
 .chat-suggest .sig { white-space: normal; text-align: left; cursor: pointer; }
+
+/* Selects: long choices end in an ellipsis instead of a hard cut; the open menu uses the same type
+   and colours in every browser (Firefox and Windows render options with page styles). */
+select { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+select option, select optgroup { font-family: var(--font-mono); font-size: 12px; color: var(--fg); background: var(--bg-surface); }
+select optgroup { font-weight: 600; color: var(--fg-muted); }
+.feedback-form select { min-width: 180px; }
+@media (max-width: 1080px) { .field-wide { grid-column: span 2; } }
+
+/* Toolbar layout: eight controls don't fit one row at their natural widths, so they take two
+   rows of a 12-column grid. Row 1: name 5 · state 3 · distance 2 · rating 2.
+   Row 2: score 2 · play 3 · signal 4 · sort 3. Children are in that DOM order. */
+.filters { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.filters > :nth-child(1) { grid-column: span 5; }
+.filters > :nth-child(2) { grid-column: span 3; }
+.filters > :nth-child(3), .filters > :nth-child(4), .filters > :nth-child(5) { grid-column: span 2; }
+.filters > :nth-child(6) { grid-column: span 3; }
+.filters > :nth-child(7) { grid-column: span 4; }
+.filters > :nth-child(8) { grid-column: span 3; }
+.filters > .filters-foot { grid-column: 1 / -1; }
+@media (max-width: 1080px) {
+  .filters > :nth-child(1) { grid-column: span 8; }
+  .filters > :nth-child(2) { grid-column: span 4; }
+  .filters > :nth-child(3), .filters > :nth-child(4), .filters > :nth-child(5) { grid-column: span 4; }
+  .filters > :nth-child(6), .filters > :nth-child(7) { grid-column: span 6; }
+  .filters > :nth-child(8) { grid-column: span 12; }
+}
+@media (max-width: 720px) {
+  .filters > :nth-child(n) { grid-column: span 12; }
+  .filters > :nth-child(3), .filters > :nth-child(4), .filters > :nth-child(5) { grid-column: span 6; }
+}
