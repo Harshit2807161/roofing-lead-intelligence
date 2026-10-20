@@ -54,14 +54,18 @@ If something breaks live: the API is at `/api/leads/1116285`, and the screenshot
 ## 9 · Evidence (40 s)
 "I measured instead of asserting. The scorecard covers all 85: 66 name a verified contact, and a re-run makes zero new rows and zero LLM calls. There are 87 tests. The ones that matter run the pipeline end to end on saved GAF pages, check every filter against SQL, and check that every citation resolves for every lead. The honest gap: the validator checks where facts come from, not that every sentence is right. The next eval round is a check that every number in an insight matches a stored field."
 
-## 10 · Failure modes (40 s)
-"What breaks, and what catches it. If GAF rotates its key, the run fails loudly, because I check counts. If the model misquotes, code drops the signal. A review with instructions in it is treated as data, and the chat's tools are read-only, so there's nothing to send. Chat budgets stop loops. And when the data doesn't hold the answer, it says so."
+## 10 · Future: production (60 s)
+"To go from one laptop to thousands of reps, three changes.
+- **Identity:** a login with JWT sessions, meaning a short-lived access token and a refresh token in an httpOnly cookie. Each rep sees their own territory, and managers get the tuner. The workflow and feedback rows already store who acted, so this slots in.
+- **Read path:** the app is already stateless, since even the chat carries its history in the request. So it scales out behind a load balancer. Redis caches the list, lead pages and tag counts, and is invalidated when a run lands. Chat gets per-rep rate limits, and Postgres gets read replicas.
+- **Write path:** one job per contractor on a queue, run by Celery workers asynchronously. That means retries with backoff, idempotent jobs because of the input hash we already store, nightly runs from a scheduler, and the deferred POST /pipeline/runs simply enqueues.
+Cost still grows with contractors, not reps, because reps only read precomputed rows."
 
 ## 11 · Future considerations (60 s)
 "Three directions.
 - **Data:** widen to all 426, which is one setting and makes tier a real signal. Research owners for the top leads with Perplexity, which is built for cited web search. Match against the distributor's customer book, and flag what changed between runs.
 - **Learning:** downvotes become eval cases. Tuner weights, then win/loss data, set the score instead of my judgment. Embeddings come in when paraphrase or volume needs them; Postgres full-text is enough for 220 reviews.
-- **Production:** a queue and workers per contractor, scheduled runs, rep logins and territories, tracing and cost dashboards, and CRM write-back behind an approval step."
+- **Product:** CRM write-back behind an approval step, tracing and cost dashboards, and daily 'what changed' alerts rather than another dashboard."
 
 ## 12 · Close (10 s)
 "Ranked, explained and checkable. P0 is on main; the P1 features are on their branch. Happy to take questions."
@@ -74,4 +78,5 @@ If something breaks live: the API is at `/api/leads/1116285`, and the screenshot
 - **Why not embeddings / RAG?** "Each contractor's record fits in one prompt. For the chat, full-text search over 220 reviews is exact and enough; embeddings come with scale or paraphrase."
 - **Why OpenAI and not Perplexity?** "Perplexity searches the web even with no tools, and is weakest on private data. OpenAI's strict structured output fits extraction and writing. Perplexity fits owner research."
 - **Is scraping OK?** "Public pages only, one at a time with a pause, using GAF's own search API the page calls. The key lives in config, not in code."
-- **Scale to thousands of reps?** "Reps only read precomputed rows. Cost grows with contractors, not reps. The chat is the one per-rep cost, and it has budgets."
+- **Scale to thousands of reps?** "Reps only read precomputed rows, cached in Redis, from stateless app servers. Writes are per-contractor Celery jobs. The chat is the one per-rep cost, and it has budgets and rate limits."
+- **What breaks, and what catches it?** "GAF rotates its key: the run fails loudly on the count check. A misquote: the verbatim check drops it. An invented person: the validator rejects it. Instructions in a review: treated as data, and the tools are read-only."

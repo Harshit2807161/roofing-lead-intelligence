@@ -335,21 +335,30 @@ td b { font-weight: 600; }
   <div class="chrome"><span>evals/scorecard.py · pytest</span><span>09</span></div>
 </section>
 
-<!-- === 10. FAILURE MODES === -->
+<!-- === 10. FUTURE: PRODUCTION HARDENING === -->
 <section class="slide">
   <div class="frame">
-    <span class="eyebrow reveal d1"><span class="pip"></span>Failure modes</span>
-    <h2 class="reveal d2">What breaks, and what catches it</h2>
-    <table class="reveal d3" style="font-size:24px">
-      <tr><th style="width:36%">If…</th><th>…then</th></tr>
-      <tr><td><b>GAF rotates its key or blocks us</b></td><td>The run fails loudly (count check); raw files let us re-parse without re-fetching</td></tr>
-      <tr><td><b>The model misquotes or invents a person</b></td><td>Verbatim check drops the signal; validator rejects the insight, one retry, else "needs review"</td></tr>
-      <tr><td><b>A review contains instructions</b></td><td>Treated as data; chat tools are read-only, so there's nothing to send or write</td></tr>
-      <tr><td><b>The chat loops or stalls</b></td><td>Budgets on steps, tool calls and time, then a forced answer; 40 s timeout</td></tr>
-      <tr><td><b>The answer isn't in our data</b></td><td>It says so ("That isn't in our data") instead of guessing</td></tr>
-    </table>
+    <span class="eyebrow reveal d1"><span class="pip"></span>Future considerations · production</span>
+    <h2 class="reveal d2">From one rep's laptop to thousands of reps</h2>
+    <div class="grid g3">
+      <div class="card reveal d3"><div class="k">01 · Identity</div><div class="v" style="font-size:52px">JWT sessions</div>
+        <ul class="list" style="margin-top:22px;gap:12px">
+          <li style="font-size:25px">Login, then a short-lived access token with a refresh token in an httpOnly cookie</li>
+          <li style="font-size:25px">Each rep sees their own territory; managers get the tuner</li>
+          <li style="font-size:25px">Workflow and feedback rows already carry an actor field</li></ul></div>
+      <div class="card reveal d4"><div class="k">02 · Read path</div><div class="v" style="font-size:52px">Redis + scale out</div>
+        <ul class="list" style="margin-top:22px;gap:12px">
+          <li style="font-size:25px">The app is already stateless, so it runs on N servers behind a load balancer</li>
+          <li style="font-size:25px">Redis caches lists, lead pages and tag counts; invalidated when a run lands</li>
+          <li style="font-size:25px">Per-rep rate limits on chat; Postgres read replicas</li></ul></div>
+      <div class="card reveal d5"><div class="k">03 · Write path</div><div class="v" style="font-size:52px">Celery workers</div>
+        <ul class="list" style="margin-top:22px;gap:12px">
+          <li style="font-size:25px">One job per contractor (fetch, parse, extract, write) on a queue, run async</li>
+          <li style="font-size:25px">Retries with backoff; the input hash keeps jobs idempotent</li>
+          <li style="font-size:25px">Nightly runs from a scheduler; POST /pipeline/runs enqueues</li></ul></div>
+    </div>
   </div>
-  <div class="chrome"><span>Guardrails in code, not in the prompt</span><span>10</span></div>
+  <div class="chrome"><span>Reps read precomputed rows; cost grows with contractors, not reps</span><span>10</span></div>
 </section>
 
 <!-- === 11. FUTURE === -->
@@ -362,8 +371,8 @@ td b { font-weight: 600; }
         <ul class="list" style="margin-top:22px;gap:12px"><li style="font-size:25px">All 426 in the circle: one setting, tier becomes a signal</li><li style="font-size:25px">Owner research on the top N (Perplexity, option C)</li><li style="font-size:25px">Match against the customer book; refresh and flag changes</li></ul></div>
       <div class="card reveal d4"><div class="k">Learning</div>
         <ul class="list" style="margin-top:22px;gap:12px"><li style="font-size:25px">Downvotes become eval cases, tied to a prompt version</li><li style="font-size:25px">Tuner weights, then win/loss data, set the score</li><li style="font-size:25px">Embeddings when paraphrase or volume demands them</li></ul></div>
-      <div class="card reveal d5"><div class="k">Production</div>
-        <ul class="list" style="margin-top:22px;gap:12px"><li style="font-size:25px">Queue and workers per contractor; scheduled runs</li><li style="font-size:25px">Rep logins and territories; tracing and cost dashboards</li><li style="font-size:25px">CRM write-back behind an approval step</li></ul></div>
+      <div class="card reveal d5"><div class="k">Product</div>
+        <ul class="list" style="margin-top:22px;gap:12px"><li style="font-size:25px">CRM write-back behind an approval step</li><li style="font-size:25px">Tracing and cost dashboards per run and per rep</li><li style="font-size:25px">Daily "what changed" alerts instead of another dashboard</li></ul></div>
     </div>
   </div>
   <div class="chrome"><span>Roadmap</span><span>11</span></div>
