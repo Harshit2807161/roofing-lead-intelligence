@@ -1,0 +1,240 @@
+{
+ "totalCount": 3,
+ "results": [
+  {
+   "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+   "title": "Allied Brothers Home Corporation",
+   "raw": {
+    "gaf_f_state_code": "NJ",
+    "systitle": "Allied Brothers Home Corporation",
+    "sysurihash": "8rWxG8ZNvnLhAmzl",
+    "urihash": "8rWxG8ZNvnLhAmzl",
+    "gaf_address": "20 Parish Dr Wayne, NJ 07470",
+    "sysuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+    "systransactionid": 281831,
+    "gaf_contractor_residential_ext_score": 1200.0,
+    "gaf_latitude": 40.91338,
+    "gaf_f_contractor_certifications_and_awards_global_search_residential": [
+     "President's Club - Award",
+     "GAF Master Elite® - Certification"
+    ],
+    "distanceinmiles": 18.729299303881156,
+    "gaf_rating": 4.9,
+    "gaf_postal_code": "07470",
+    "gaf_google_place_id": "ChIJrxhF1uZUwokRGDroMEHwK_4",
+    "gaf_is_profile_eligible": 1,
+    "sysindexeddate": 1792497729000,
+    "gaf_suppress_from_locator": 0,
+    "permanentid": "6379091e4efb828a762b3fda1a8a6439fff0189181d9fc52b5f00dc0ca7e",
+    "gaf_longitude": -74.26269,
+    "transactionid": 281831,
+    "title": "Allied Brothers Home Corporation",
+    "gaf_contractor_type": "Residential",
+    "gaf_navigation_title": "Allied Brothers Home Corporation",
+    "date": 1792497620000,
+    "gaf_content_type": "Residential Contractors",
+    "gaf_f_contractor_certifications_and_awards_residential": [
+     "President's Club - Award",
+     "GAF Master Elite® - Certification"
+    ],
+    "gaf_featured_image_src": "https://services.gaf.com/service-assets/contractors/1116285/residential/profile-photos/TUpXccX0C29kvecJ0C.png?width=120",
+    "gaf_phone": "(973) 566-0060",
+    "gaf_f_country_code": "USA",
+    "rowid": 1792497718785910870,
+    "gaf_enrolled_in_gaf_leads": 1,
+    "size": 1419,
+    "gaf_contractor_id": "1116285",
+    "clickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+    "syssource": "prod-gaf-contractors",
+    "gaf_featured_image_alt": "Allied Brothers Home Corporation",
+    "orderingid": 1792497621755,
+    "syssize": 1419,
+    "sysdate": 1792497620000,
+    "gaf_is_locator_eligible": 1,
+    "primaryid": "HBZFO6CHHBNE45TOJRUEC3L2NQXDGMRVGE4S4ZDFMZQXK3DU",
+    "wordcount": 0,
+    "source": "prod-gaf-contractors",
+    "gaf_f_contractor_designations_residential": [
+     "President’s Club 2 Star^_^RESIDENTIAL^_^A",
+     "MASTER_ELITE^_^RESIDENTIAL^_^C",
+     "GAF Leads^_^RESIDENTIAL^_^P"
+    ],
+    "collection": "default",
+    "gaf_residential_presidents_club_stars_count": 2,
+    "indexeddate": 1792497729000,
+    "gaf_number_of_reviews": 283,
+    "sysclickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+    "identifiableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+    "gaf_f_city": "Wayne",
+    "sysrowid": 1792497718785910870,
+    "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/wayne/allied-brothers-home-corporation-1116285",
+    "syscollection": "default"
+   }
+  },
+  {
+   "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+   "title": "Blackstone Group LLC",
+   "raw": {
+    "gaf_f_state_code": "NJ",
+    "systitle": "Blackstone Group LLC",
+    "sysurihash": "8rnecHOb0gHcoliR",
+    "urihash": "8rnecHOb0gHcoliR",
+    "gaf_address": "169 Scotland Rd Orange, NJ 07050",
+    "sysuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+    "systransactionid": 281831,
+    "gaf_contractor_residential_ext_score": 1000.0,
+    "gaf_latitude": 40.770529,
+    "gaf_f_contractor_certifications_and_awards_global_search_residential": [
+     "GAF Master Elite® - Certification"
+    ],
+    "distanceinmiles": 12.452004665012286,
+    "gaf_rating": 0.0,
+    "gaf_postal_code": "07050",
+    "gaf_f_contractor_certifications_and_awards_global_search_commercial": [
+     "GAF GoldElite™ Commercial Contractor"
+    ],
+    "gaf_is_profile_eligible": 1,
+    "sysindexeddate": 1792497752000,
+    "gaf_suppress_from_locator": 0,
+    "permanentid": "dbe2c883f80c36171d630fac043f8b28ee6aa951bb9e7e8fb30f99169edc",
+    "gaf_longitude": -74.238392,
+    "transactionid": 281831,
+    "title": "Blackstone Group LLC",
+    "gaf_contractor_type": "Residential",
+    "gaf_navigation_title": "Blackstone Group LLC",
+    "date": 1792497621000,
+    "gaf_content_type": "Residential Contractors",
+    "gaf_f_contractor_certifications_and_awards_residential": [
+     "GAF Master Elite® - Certification"
+    ],
+    "gaf_contractor_commercial_ext_score": 100.0,
+    "gaf_featured_image_src": "/-/media/images/contractor-profile/contractor-profile-placeholder/no_profile_image.svg",
+    "gaf_phone": "(973) 624-6300",
+    "gaf_f_country_code": "USA",
+    "gaf_f_contractor_certifications_and_awards_commercial": [
+     "GAF GoldElite™ Commercial Contractor"
+    ],
+    "rowid": 1792497729327169272,
+    "gaf_enrolled_in_gaf_leads": 1,
+    "size": 1536,
+    "gaf_contractor_id": "1151902",
+    "clickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+    "syssource": "prod-gaf-contractors",
+    "gaf_featured_image_alt": "Default Profile Image",
+    "orderingid": 1792497621755,
+    "syssize": 1536,
+    "sysdate": 1792497621000,
+    "gaf_f_contractor_designations_commercial": [
+     "ASPH^_^COMMERCIAL^_^T",
+     "SPLY^_^COMMERCIAL^_^T",
+     "GOLDELITE^_^COMMERCIAL^_^C"
+    ],
+    "gaf_is_locator_eligible": 1,
+    "primaryid": "HBZG4ZLDJBHWEMDHJBRW63DJKIXDGMRVGE4S4ZDFMZQXK3DU",
+    "wordcount": 0,
+    "source": "prod-gaf-contractors",
+    "gaf_f_contractor_designations_residential": [
+     "MASTER_ELITE^_^RESIDENTIAL^_^C",
+     "GAF Leads^_^RESIDENTIAL^_^P"
+    ],
+    "collection": "default",
+    "indexeddate": 1792497752000,
+    "gaf_number_of_reviews": 0,
+    "sysclickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+    "gaf_f_contractor_technologies_commercial": [
+     "Asphaltic Roofer",
+     "Single-Ply Roofer"
+    ],
+    "identifiableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+    "gaf_f_city": "Orange",
+    "sysrowid": 1792497729327169272,
+    "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/orange/blackstone-group-llc-1151902",
+    "syscollection": "default"
+   }
+  },
+  {
+   "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+   "title": "Donny's Home Improvement",
+   "raw": {
+    "gaf_f_state_code": "NJ",
+    "systitle": "Donny's Home Improvement",
+    "sysurihash": "jFz8DxALJtxWyO1c",
+    "urihash": "jFz8DxALJtxWyO1c",
+    "gaf_address": "30 16th Ave Elmwood Park, NJ 07407",
+    "sysuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+    "systransactionid": 281831,
+    "gaf_contractor_residential_ext_score": 1100.0,
+    "gaf_latitude": 40.917111,
+    "gaf_f_contractor_certifications_and_awards_global_search_residential": [
+     "President's Club - Award",
+     "GAF Master Elite® - Certification"
+    ],
+    "distanceinmiles": 14.696756860307195,
+    "gaf_rating": 5.0,
+    "gaf_postal_code": "07407",
+    "gaf_f_contractor_certifications_and_awards_global_search_commercial": [
+     "GAF Certified™ Commercial Contractor"
+    ],
+    "gaf_google_place_id": "ChIJ_YLVUBr0DoIRpzBoH-QHtSU",
+    "gaf_is_profile_eligible": 1,
+    "sysindexeddate": 1792497744000,
+    "gaf_suppress_from_locator": 0,
+    "permanentid": "fbce4172aa12f31795a5be3da47de854bffe2a76dc4f7a150de9eaf49441",
+    "gaf_longitude": -74.120537,
+    "transactionid": 281831,
+    "title": "Donny's Home Improvement",
+    "gaf_contractor_type": "Residential",
+    "gaf_navigation_title": "Donny's Home Improvement",
+    "date": 1792497621000,
+    "gaf_content_type": "Residential Contractors",
+    "gaf_f_contractor_certifications_and_awards_residential": [
+     "President's Club - Award",
+     "GAF Master Elite® - Certification"
+    ],
+    "gaf_contractor_commercial_ext_score": 0.0,
+    "gaf_featured_image_src": "https://services.gaf.com/service-assets/contractors/1139561/residential/profile-photos/Tbi8Ue51xpCGSEDjsU.png?width=120",
+    "gaf_contractor_dba": "Donny's Home Improvement",
+    "gaf_phone": "(973) 333-6364",
+    "gaf_f_country_code": "USA",
+    "rowid": 1792497725474440825,
+    "gaf_enrolled_in_gaf_leads": 1,
+    "size": 1725,
+    "gaf_contractor_id": "1139561",
+    "clickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+    "syssource": "prod-gaf-contractors",
+    "gaf_featured_image_alt": "Donny's Home Improvement",
+    "orderingid": 1792497621755,
+    "syssize": 1725,
+    "sysdate": 1792497621000,
+    "gaf_f_contractor_designations_commercial": [
+     "ASPH^_^COMMERCIAL^_^T",
+     "SPLY^_^COMMERCIAL^_^T",
+     "COMMERCIAL_CERTIFIED^_^COMMERCIAL^_^C"
+    ],
+    "gaf_is_locator_eligible": 1,
+    "primaryid": "NJDHUOCEPBAUYSTUPBLXSTZRMMXDGMRVGE4S4ZDFMZQXK3DU",
+    "wordcount": 0,
+    "source": "prod-gaf-contractors",
+    "gaf_f_contractor_designations_residential": [
+     "President’s Club 1 Star^_^RESIDENTIAL^_^A",
+     "MASTER_ELITE^_^RESIDENTIAL^_^C",
+     "GAF Leads^_^RESIDENTIAL^_^P"
+    ],
+    "collection": "default",
+    "gaf_residential_presidents_club_stars_count": 1,
+    "indexeddate": 1792497744000,
+    "gaf_number_of_reviews": 125,
+    "sysclickableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+    "gaf_f_contractor_technologies_commercial": [
+     "Asphaltic Roofer",
+     "Single-Ply Roofer"
+    ],
+    "identifiableuri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+    "gaf_f_city": "Elmwood Park",
+    "sysrowid": 1792497725474440825,
+    "uri": "https://www.gaf.com/en-us/roofing-contractors/residential/usa/nj/elmwood-park/donnys-home-improvement-1139561",
+    "syscollection": "default"
+   }
+  }
+ ]
+}
