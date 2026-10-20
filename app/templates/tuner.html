@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set active = "tuner" %}
+{% set version = payload.version or "score-v1" %}
+{% block title %}Ranking tuner · Roofing Leads{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/explain.css">{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <span class="eyebrow"><span class="pip" aria-hidden="true"></span>Sales manager · what-if</span>
+    <h1 class="h1">Ranking tuner</h1>
+    <p class="lead muted">Tilt the score toward this quarter's push: re-weight the ten factors and all {{ payload.leads | length }} leads re-rank live. Each lead keeps its factor-by-factor breakdown; hover a bar segment for the reason.</p>
+  </div>
+</section>
+
+<div class="wi">
+  <form class="card wi-controls" id="wi-form" onsubmit="return false" aria-label="Factor weights">
+    <div class="wi-controls-head">
+      <span class="label">Factor weight</span>
+      <span class="meta subtle" id="wi-max"></span>
+    </div>
+    <div class="wi-sliders">
+      {% for f in payload.factors %}
+      <label class="wi-slider" data-k="{{ f.key }}">
+        <span class="wi-slider-head"><span>{{ f.label }}</span><output id="o-{{ f.key }}">1× · {{ f.max | num }} pts</output></span>
+        <input type="range" min="0" max="2" step="0.1" value="1" data-k="{{ f.key }}" aria-label="{{ f.label }} weight, 0 to 2 times">
+      </label>
+      {% endfor %}
+    </div>
+    <div class="wi-foot">
+      <button class="btn btn-secondary btn-sm" type="button" id="wi-reset" title="Back to {{ version }} weights (all 1×)">Reset</button>
+      <button class="btn btn-primary btn-sm" type="button" id="wi-copy">Copy weights (JSON)</button>
+    </div>
+    <p class="wi-note"><span class="label">What-if only</span> The official ranking still uses {{ version }} weights. Hand the weights to engineering to make them the default.</p>
+  </form>
+
+  <section class="card section-card wi-results" aria-labelledby="wi-h">
+    <div class="section-head">
+      <h2 class="h3" id="wi-h">Re-ranked leads</h2>
+      <span class="meta subtle" id="wi-summary" aria-live="polite">Official {{ version }} order</span>
+    </div>
+    <div class="wi-row wi-row-head label" aria-hidden="true">
+      <span class="lead-rank">#</span><span>Move</span><span>Lead</span><span>Breakdown</span><span class="wi-num">New</span><span class="wi-num">Official</span>
+    </div>
+    <ol class="wi-list" id="wi-list">
+      {# Server-rendered official order; tuner.js redraws it on load and on every slider move. #}
+      {% for l in payload.leads %}
+      <li><div class="wi-row"><span class="lead-rank">{{ l.rank }}</span><span class="mv same">—</span><span class="lead-meta"><a class="lead-name" href="/leads/{{ l.id }}">{{ l.name }}</a><span class="lead-sub">{{ l.city }}, {{ l.state }} · {{ l.play }}</span></span><span></span><span class="wi-num"><span class="score">{{ l.total | round | int }}</span></span><span class="wi-num wi-official">{{ l.total | num }}</span></div></li>
+      {% endfor %}
+    </ol>
+    <button class="btn btn-ghost btn-sm wi-more" type="button" id="wi-more" aria-controls="wi-list" aria-expanded="false">Show all {{ payload.leads | length }}</button>
+  </section>
+</div>
+
+<div id="tip" role="tooltip" hidden></div>
+<script type="application/json" id="tuner-data">{{ payload | tojson }}</script>
+{% endblock %}
+
+{% block scripts %}<script src="/static/tuner.js" defer></script>{% endblock %}
