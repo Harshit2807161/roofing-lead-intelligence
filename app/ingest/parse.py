@@ -158,22 +158,27 @@ def parse_profile(html: str) -> dict:
     }
 
 
+def street_from_address(listing_row: dict) -> str | None:
+    """'20 Parish Dr Wayne, NJ 07470' -> '20 Parish Dr' (the listing's one-line address)."""
+    full = listing_row.get("_address_full") or ""
+    street = full.split(f" {listing_row.get('city')},")[0] if full else ""
+    return street.strip() or None
+
+
 def merge(listing_row: dict, profile: dict | None) -> ContractorRecord:
     """Listing wins for name, phone, rating, review count and distance; the profile adds the rest."""
     row = {k: v for k, v in listing_row.items() if not k.startswith("_")}
     if profile is None:
-        # No profile page (fetch failed): keep the listing fields; street comes from the address line.
-        # "20 Parish Dr Wayne, NJ 07470" -> "20 Parish Dr"
-        full = listing_row.get("_address_full") or ""
-        street = full.split(f" {listing_row.get('city')},")[0] if full else ""
-        return ContractorRecord(**row, street=street or None, profile_fetched=False)
+        # No profile page (fetch failed): keep the listing fields.
+        return ContractorRecord(**row, street=street_from_address(listing_row), profile_fetched=False)
 
     if profile.get("details_contractor_id") not in (None, row["gaf_id"]):
         raise ValueError(f"profile is for {profile['details_contractor_id']}, not {row['gaf_id']}")
     tel = profile.get("tel_link")
     return ContractorRecord(
         **row,
-        street=profile["street"],
+        # Some profiles leave the street out of their schema.org block; the listing still has it.
+        street=profile["street"] or street_from_address(listing_row),
         about=profile["about"],
         website=profile["website"],
         license_number=profile["license_number"],
