@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     coveo_api_key: str = ""
     coveo_pipeline: str = "prod-gaf-recommended-residential-contractors"
 
+    # LLM models (OpenAI). Small for extraction, stronger for writing; see ARCHITECTURE-OPTIONS.md.
+    openai_api_key: str = ""
+    small_model: str = "gpt-6-luna"
+    model: str = "gpt-6.1-sol"
+    llm_concurrency: int = 8
+
     # Profile fetching: one page at a time, with a pause, so we stay polite and unblocked.
     fetch_delay_s: float = 1.5
     fetch_timeout_s: float = 30.0
