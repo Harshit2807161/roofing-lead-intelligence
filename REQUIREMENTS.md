@@ -37,6 +37,7 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 - The UI should look like it came from InstaLILY: their fonts, colours, spacing and card style.
 - **Before any UI code:** pull InstaLILY's style from instalily.ai with the `brand` skill (palette and type), turn it into CSS variables with the `design-system` skill, and render a one-page style card to check before building screens. If the live site blocks us, use the saved pages in `onsite-prep/offline/reading/instalily/`.
 - First look at the saved homepage and InstaProspect pages: **DM Mono** for body and labels plus a separate display face, near-black text on warm off-white (`#0a0a0a`, `#f2f3ec`).
+- **Score DNA strip (built):** every list row shows its score as ten segments, one per factor, sized by the factor's cap and filled by points earned, with complaints as a red tail. Hover a segment for the factor and reason. Filters sit in a toolbar above the list so rows keep the full width.
 - **Layout precedent:** InstaProspect's ranked lead list (rank, initials, owner, rating, estimated value, score) is InstaLILY's own UI for this exact job.
 
 ## P1 (only after P0 runs end to end)
@@ -47,6 +48,8 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 | F10 | **Refresh and change detection:** re-run the same search, and flag what's new (new contractor, tier change, review surge) |
 | F11 | **Extra enrichment:** the contractor's own website (services, team page, owner). This goes beyond GAF's pages, so it's in only if the chosen architecture needs it |
 | F12 | **Feedback:** thumbs up or down on an insight, stored to improve prompts and scores |
+| F14 | **Head-to-head compare** (separate page): pick two leads and see the score gap factor by factor, with a one-line "why #1 beats #2". Mockup D in `/static/mockups/explainability.html` |
+| F15 | **Ranking tuner for the sales manager** (separate page): sliders re-weight the score factors and all 85 re-rank live, with rank movement shown; reps keep the same explainable breakdown. Mockup E |
 | F13 | **All 426 in the circle:** drop the "recommended" flag to include GAF Certified and Certified Plus contractors, making tier a real score input |
 
 **F8 rep prep chat, in more detail:**
