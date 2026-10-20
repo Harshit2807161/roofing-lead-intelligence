@@ -312,3 +312,11 @@ input[type="search"]:focus, select:focus { border-color: var(--accent); outline:
   .avatar { width: 32px; height: 32px; }
   .swatches { grid-template-columns: 1fr; }
 }
+
+/* Weight pass: one step bolder everywhere, for legibility on a projector. DM Mono is loaded up
+   to 500, IBM Plex Sans up to 600. */
+.label, .stat-label { font-weight: 500; }
+.hero, .h1, .h2, .h3, .stat-num { font-weight: 500; }
+.lead-name, .person-name, .factor-points, .map-pop-name, .score { font-weight: 600; }
+.lead, .lead-summary, .next-action p, .claims li, .factor-reason, .review-text, .about-text, .quote { font-weight: 500; }
+.lead-meta, dd { font-weight: 500; }
