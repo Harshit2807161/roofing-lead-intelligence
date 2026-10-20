@@ -108,6 +108,7 @@
           {% endif %}
         </div>
       {% endif %}
+      {% if lead.insight %}{% include "partials/feedback.html" %}{% endif %}
     </section>
 
     <section class="card section-card" aria-labelledby="score-h">
@@ -148,6 +149,7 @@
   </div>
 
   <aside class="side-col">
+    {% include "partials/workflow_card.html" %}
     <section class="card section-card map-card">
       <div id="detail-map" class="mini-map" data-lat="{{ lead.lat }}" data-lng="{{ lead.lng }}" data-name="{{ lead.name }}" data-center="{{ center | tojson | forceescape }}"></div>
       <p class="meta subtle">{{ lead.distance_mi | num }} mi from ZIP 10013</p>

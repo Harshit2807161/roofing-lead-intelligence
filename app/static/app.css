@@ -362,3 +362,29 @@ input[type="search"]:focus, select:focus { border-color: var(--accent); outline:
   .lead-row { grid-template-columns: 22px 32px minmax(0, 1fr) 56px; }
   .lead-explain, .sig-legend { display: none; }
 }
+
+/* ---------- P1: workflow (F9) and feedback (F12) ---------- */
+.btn-small { padding: 6px 12px; font-size: 11px; min-height: 30px; }
+.btn.is-active { background: var(--fg); color: var(--fg-inverse); border-color: var(--fg); }
+.status-chip { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: var(--r-pill);
+  border: 1px solid var(--border); color: var(--fg-muted); background: var(--bg-surface); }
+.status-contacted { border-color: var(--accent); color: var(--accent-deep); background: var(--accent-faint); }
+.status-not_a_fit { border-color: var(--border); color: var(--fg-subtle); background: var(--bg-sunken); text-decoration: line-through; }
+.workflow-card { display: grid; gap: 12px; }
+.workflow-head { display: flex; justify-content: space-between; align-items: center; }
+.status-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.note-form { display: grid; gap: 8px; justify-items: start; }
+.note-form textarea { width: 100%; font: inherit; font-family: var(--font-display); font-size: 13px; color: var(--fg);
+  background: var(--field-bg); border: 1px solid var(--field-border); border-radius: var(--field-radius); padding: 8px 10px; resize: vertical; }
+.note-form textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.activity { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; border-top: 1px solid var(--border-soft); padding-top: 10px; }
+.activity li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.activity-note { font-family: var(--font-display); font-size: 13px; font-weight: 500; }
+.feedback { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: var(--space-4);
+  padding-top: var(--space-3); border-top: 1px solid var(--border-soft); }
+.feedback-form { display: flex; gap: 6px; align-items: center; }
+.feedback-form select { width: auto; min-height: 30px; font-size: 11px; padding: 5px 26px 5px 10px; }
+.field-inline { display: flex; gap: 10px; align-items: center; }
+.field-inline legend { float: left; margin: 0 4px 0 0; }
+.note-form .field { width: 100%; }

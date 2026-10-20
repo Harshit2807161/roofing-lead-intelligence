@@ -99,6 +99,14 @@
     </label>
 
     <div class="filters-foot">
+      <fieldset class="field field-inline">
+        <legend class="label">Status</legend>
+        <div class="segmented">
+          {% for value, text in [("", "All")] + statuses.items() | list %}
+          <label><input type="radio" name="status" value="{{ value }}" {% if (filters.status or "") == value %}checked{% endif %}><span>{{ text }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
       <label class="check"><input type="checkbox" name="presidents_club" value="1" {% if filters.presidents_club %}checked{% endif %}><span>President's Club only</span></label>
       <label class="check"><input type="checkbox" name="commercial" value="1" {% if filters.commercial %}checked{% endif %}><span>Commercial-certified only</span></label>
       <a class="link-quiet meta" href="/">Reset filters</a>

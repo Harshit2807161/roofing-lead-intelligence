@@ -40,6 +40,7 @@ def lead_list(request: Request, session: SessionDep) -> HTMLResponse:
         "plays": data.PLAYS,
         "sorts": data.SORTS,
         "tag_options": data.tag_options(session),
+        "statuses": data.LEAD_STATUSES,
     }
     return templates.TemplateResponse(request, "index.html", ctx)
 
@@ -51,7 +52,9 @@ def lead_page(request: Request, gaf_id: str, session: SessionDep) -> HTMLRespons
         return templates.TemplateResponse(
             request, "not_found.html", {"gaf_id": gaf_id}, status_code=404
         )
-    return templates.TemplateResponse(request, "detail.html", {"lead": lead, "center": _center()})
+    ctx = {"lead": lead, "center": _center(), "statuses": data.LEAD_STATUSES,
+           "reasons": data.FEEDBACK_REASONS}  # fmt: skip
+    return templates.TemplateResponse(request, "detail.html", ctx)
 
 
 @router.get("/style", response_class=HTMLResponse)

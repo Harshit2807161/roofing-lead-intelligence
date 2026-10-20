@@ -1,0 +1,17 @@
+{# F12: a vote on this insight, stored with the prompt version and input hash that produced it. #}
+<div class="feedback" id="feedback">
+  <span class="label">Was this insight useful?</span>
+  <form class="feedback-form" hx-post="/leads/{{ lead.gaf_id }}/feedback" hx-target="#feedback" hx-swap="outerHTML">
+    <button class="btn btn-small" type="submit" name="vote" value="1">Useful</button>
+    <select name="reason" aria-label="Why not useful">
+      <option value="">Why not?</option>
+      {% for r in reasons %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-small" type="submit" name="vote" value="-1">Not useful</button>
+  </form>
+  <span class="meta subtle">
+    {%- if just_voted %}Thanks, recorded. {% endif -%}
+    {{ lead.feedback.up }} useful · {{ lead.feedback.down }} not useful
+    {%- for r, n in lead.feedback.reasons.items() %} · {{ r }} ({{ n }}){% endfor %}
+  </span>
+</div>

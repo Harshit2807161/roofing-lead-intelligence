@@ -14,7 +14,16 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.intel.insight import facts_for
 from app.intel.tags import semantic_tags, tag_label
-from app.models import Contractor, ContractorSignals, LeadInsight, LeadScore, Run, SignalCategory
+from app.models import (
+    Contractor,
+    ContractorSignals,
+    InsightFeedback,
+    LeadActivity,
+    LeadInsight,
+    LeadScore,
+    Run,
+    SignalCategory,
+)
 
 PLAYS = [
     "Volume leader",
@@ -30,6 +39,9 @@ SORTS = {
     "rating": "Rating",
     "reviews": "Review count",
 }
+# P1 workflow (F9) and feedback (F12) vocabularies, checked in code on every write.
+LEAD_STATUSES = {"new": "New", "contacted": "Contacted", "not_a_fit": "Not a fit"}
+FEEDBACK_REASONS = ["Wrong contact", "Wrong facts", "Too generic", "Not useful for a call"]
 PENALTY_SCALE = 10.0  # points; the width reference for negative factors
 _SKIP_WORDS = {"the", "and", "&", "of", "inc", "inc.", "llc", "llc.", "co", "co.", "corp", "corp."}
 
@@ -47,6 +59,7 @@ class Filters:
     commercial: bool = False
     q: str | None = None
     tag: str | None = None  # a semantic tag key, e.g. "storm" or "trade:siding"
+    status: str | None = None  # new | contacted | not_a_fit
     sort: str = "rank"
 
     @classmethod
@@ -63,6 +76,7 @@ class Filters:
             commercial=_flag(p.get("commercial")),
             q=(p.get("q") or "").strip() or None,
             tag=(p.get("tag") or "").strip() or None,
+            status=status if (status := (p.get("status") or "").strip()) in LEAD_STATUSES else None,
             sort=sort if sort in SORTS else "rank",
         )
 
@@ -124,7 +138,11 @@ def _lead_query(f: Filters) -> Select:
 
 
 def lead_row(
-    c: Contractor, s: LeadScore | None, i: LeadInsight | None, tags: list[dict] | None = None
+    c: Contractor,
+    s: LeadScore | None,
+    i: LeadInsight | None,
+    tags: list[dict] | None = None,
+    status: str = "new",
 ) -> dict[str, Any]:
     """The fields one row of the ranked list needs (also the /api/leads item shape)."""
     return {
@@ -150,6 +168,8 @@ def lead_row(
         "insight_status": i.status if i else None,
         "summary": (i.data or {}).get("summary") if i else None,
         "tags": tags or [],
+        "status": status,
+        "status_label": LEAD_STATUSES[status],
     }
 
 
@@ -158,15 +178,72 @@ def promoted_categories(session: Session) -> frozenset[str]:
     return frozenset(session.scalars(stmt))
 
 
+def current_statuses(session: Session) -> dict[str, str]:
+    """Latest status per lead; a lead with no status row is "new". Oldest first, so later rows win."""
+    stmt = (
+        select(LeadActivity.gaf_id, LeadActivity.status)
+        .where(LeadActivity.status.is_not(None))
+        .order_by(LeadActivity.created_at, LeadActivity.id)
+    )
+    return dict(session.execute(stmt).all())
+
+
 def list_leads(session: Session, f: Filters) -> list[dict[str, Any]]:
     promoted = promoted_categories(session)
+    statuses = current_statuses(session)
     rows = [
-        lead_row(c, s, i, semantic_tags(sig.data if sig else None, promoted))
+        lead_row(
+            c,
+            s,
+            i,
+            semantic_tags(sig.data if sig else None, promoted),
+            statuses.get(c.gaf_id, "new"),
+        )
         for c, s, i, sig in session.execute(_lead_query(f)).all()
     ]
-    if f.tag:  # tags come from JSON signals, so this filter runs here rather than in SQL
+    # Tags and statuses come from other tables' JSON and history, so these filters run here.
+    if f.tag:
         rows = [r for r in rows if any(f.tag in t["keys"] for t in r["tags"])]
+    if f.status:
+        rows = [r for r in rows if r["status"] == f.status]
     return rows
+
+
+def workflow(session: Session, gaf_id: str) -> dict[str, Any]:
+    """Current status and the full activity history, newest first (F9)."""
+    rows = session.scalars(
+        select(LeadActivity).where(LeadActivity.gaf_id == gaf_id)
+        .order_by(LeadActivity.created_at.desc(), LeadActivity.id.desc())
+    ).all()  # fmt: skip
+    status = next((r.status for r in rows if r.status), "new")
+    return {
+        "status": status,
+        "status_label": LEAD_STATUSES[status],
+        "history": [
+            {
+                "status": r.status,
+                "status_label": LEAD_STATUSES.get(r.status or ""),
+                "note": r.note,
+                "actor": r.actor,
+                "created_at": r.created_at,
+            }
+            for r in rows
+        ],  # fmt: skip
+    }
+
+
+def feedback_summary(session: Session, gaf_id: str) -> dict[str, Any]:
+    """Votes on this lead's insight (F12): totals and the reasons given for downvotes."""
+    rows = session.scalars(select(InsightFeedback).where(InsightFeedback.gaf_id == gaf_id)).all()
+    reasons: dict[str, int] = {}
+    for r in rows:
+        if r.reason:
+            reasons[r.reason] = reasons.get(r.reason, 0) + 1
+    return {
+        "up": sum(r.vote > 0 for r in rows),
+        "down": sum(r.vote < 0 for r in rows),
+        "reasons": reasons,
+    }
 
 
 def tag_options(session: Session) -> list[dict[str, Any]]:
@@ -256,8 +333,17 @@ def lead_detail(session: Session, gaf_id: str) -> dict[str, Any] | None:
     address = ", ".join(
         x for x in [c.street, c.city, f"{c.state or ''} {c.postal_code or ''}"] if x
     )
+    flow = workflow(session, gaf_id)
     return {
-        **lead_row(c, s, i, semantic_tags(sig.data if sig else None, promoted_categories(session))),
+        **lead_row(
+            c,
+            s,
+            i,
+            semantic_tags(sig.data if sig else None, promoted_categories(session)),
+            flow["status"],
+        ),
+        "workflow": flow,
+        "feedback": feedback_summary(session, gaf_id),
         "dba": c.dba,
         "address": address.strip(", "),
         "phone": c.display_phone or c.phone,

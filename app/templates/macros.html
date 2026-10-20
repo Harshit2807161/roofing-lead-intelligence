@@ -51,6 +51,7 @@
     </span>
     <span class="lead-explain">
       <span class="lead-tags">
+        {% if l.status != "new" %}<span class="status-chip status-{{ l.status }}">{{ l.status_label }}</span>{% endif %}
         {{ play_tag(l.play) }}
         {{ pc_stars(l.presidents_club_stars) }}
         {% if l.commercial %}<span class="chip">Commercial</span>{% endif %}
