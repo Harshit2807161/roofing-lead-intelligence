@@ -5,7 +5,7 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 
 ## Scope
 - **P0 (build now):** the brief's search only, GAF residential contractors within 25 miles of ZIP **10013**: scrape → store → score → insights → Rep UI, end to end on that one dataset (85 contractors).
-- **P1 (after P0 works):** a rep prep chat over the stored data; widening the same circle from the 85 "recommended" contractors to all 426 (one setting); plus the smaller items listed under P1 below.
+- **P1 (on branch `feat/p1-rep-tools`, merged only on approval):** rep prep chat, lead workflow, insight feedback, head-to-head compare, and a ranking tuner for the sales manager.
 - **Out of scope:** any other ZIP or radius, multi-ZIP territories, distance from a rep's branch. ZIP and radius sit in one config value so they aren't hard-coded, but nothing in the UI, API or evals uses other values.
 - **Parked:** non-functional requirements (scale, reliability, cost, observability, security). We come back to them after P0; the list is at the bottom so nothing is lost.
 
@@ -40,17 +40,14 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 - **Score DNA strip (built):** every list row shows its score as ten segments, one per factor, sized by the factor's cap and filled by points earned, with complaints as a red tail. Hover a segment for the factor and reason. Filters sit in a toolbar above the list so rows keep the full width.
 - **Layout precedent:** InstaProspect's ranked lead list (rank, initials, owner, rating, estimated value, score) is InstaLILY's own UI for this exact job.
 
-## P1 (only after P0 runs end to end)
+## P1 (only after P0 runs end to end; P0 checked on 20 Oct: F1–F6 met, F7's run trigger deferred)
 | ID | Requirement |
 |---|---|
 | F8 | **Rep prep chat:** a chat panel where a rep prepares for a call and asks questions, answered only from our stored data (details below) |
 | F9 | **Lead workflow:** rep marks a lead new / contacted / not a fit, and adds notes |
-| F10 | **Refresh and change detection:** re-run the same search, and flag what's new (new contractor, tier change, review surge) |
-| F11 | **Extra enrichment:** the contractor's own website (services, team page, owner). This goes beyond GAF's pages, so it's in only if the chosen architecture needs it |
 | F12 | **Feedback:** thumbs up or down on an insight, stored to improve prompts and scores |
 | F14 | **Head-to-head compare** (separate page): pick two leads and see the score gap factor by factor, with a one-line "why #1 beats #2". Mockup D in `/static/mockups/explainability.html` |
 | F15 | **Ranking tuner for the sales manager** (separate page): sliders re-weight the score factors and all 85 re-rank live, with rank movement shown; reps keep the same explainable breakdown. Mockup E |
-| F13 | **All 426 in the circle:** drop the "recommended" flag to include GAF Certified and Certified Plus contractors, making tier a real score input |
 
 **F8 rep prep chat, in more detail:**
 - **Two entry points:** from a lead's page ("prep me for this call", pinned to that lead), and from the list, with questions across leads ("which Master Elite contractors within 10 miles have under 50 reviews?", "who mentions storm or insurance work?", "compare X and Y").
@@ -64,6 +61,7 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 ## Out of scope
 - Any other ZIP or radius, multi-ZIP territories per rep, distance from a rep's branch.
 - Commercial directory, other manufacturers' directories, CSV or CRM export.
+- Moved out of P1 on 20 Oct: refresh and change detection (was F10); website enrichment and owner research with Perplexity (was F11, option C); widening to all 426 contractors in the circle (was F13; it stays one setting, `SEARCH_RECOMMENDED_ONLY=false`).
 
 ## Architecture
 - **Ingest:** `fetch → parse → dedupe → store` is plain code; the plan is in `DATA-EXPLORATION.md`, awaiting approval.
