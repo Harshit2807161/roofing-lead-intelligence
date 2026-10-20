@@ -1,0 +1,73 @@
+{
+ "at": "2026-10-20T16:00:18+00:00",
+ "coverage": {
+  "contractors": 85,
+  "signals": 85,
+  "scored": 85,
+  "insights": 85
+ },
+ "extraction": {
+  "items_kept": 1010,
+  "items_dropped": 8,
+  "drop_rate": 0.008,
+  "dropped_by_field": {
+   "services": 1,
+   "praise": 3,
+   "other_signals": 3,
+   "people": 1
+  }
+ },
+ "insights": {
+  "ok_first_try": 85,
+  "ok_after_retry": 0,
+  "needs_review": 0,
+  "with_named_contact": 66,
+  "failure_categories": {}
+ },
+ "signal_categories": {
+  "total": 64,
+  "promoted": [
+   [
+    "additional_project_work",
+    16
+   ],
+   [
+    "competitive_pricing",
+    34
+   ],
+   [
+    "family_owned_business",
+    12
+   ],
+   [
+    "project_speed",
+    32
+   ]
+  ]
+ },
+ "llm": {
+  "extract": {
+   "calls": 77,
+   "errors": 0,
+   "p50_s": 8.0,
+   "p95_s": 14.7,
+   "cost_usd": 0.0399
+  },
+  "discover": {
+   "calls": 2,
+   "errors": 0,
+   "p50_s": 9.5,
+   "p95_s": 15.2,
+   "cost_usd": 0.0015
+  },
+  "insight": {
+   "calls": 88,
+   "errors": 0,
+   "p50_s": 15.9,
+   "p95_s": 20.2,
+   "cost_usd": 0.8057
+  }
+ },
+ "cost_usd_total": 0.847,
+ "cost_usd_per_contractor": 0.01
+}
