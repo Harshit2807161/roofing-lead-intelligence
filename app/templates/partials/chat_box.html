@@ -21,16 +21,11 @@
     <input type="text" name="message" required maxlength="1000" autocomplete="off"
            placeholder="{% if lead_name %}Ask about {{ lead_name }}…{% else %}e.g. Which NJ contractors do siding and gutters?{% endif %}">
     <button class="btn btn-primary btn-small" type="submit">Ask</button>
-    <span class="chat-wait meta subtle">Reading the data…</span>
   </form>
   {% if not thread %}
-  <div class="chat-suggest">
+  <div class="chat-suggest" aria-label="Suggested questions">
     {% for s in suggestions %}
-    <form hx-post="/chat/messages" hx-target="#chat-box" hx-swap="outerHTML">
-      <input type="hidden" name="history" value="[]"><input type="hidden" name="gaf_id" value="{{ gaf_id or '' }}">
-      <input type="hidden" name="message" value="{{ s }}">
-      <button class="sig sig-contact" type="submit">{{ s }}</button>
-    </form>
+    <button class="sig sig-contact" type="button" data-suggest="{{ s }}">{{ s }}</button>
     {% endfor %}
   </div>
   {% endif %}

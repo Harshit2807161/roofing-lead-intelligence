@@ -197,3 +197,22 @@ def test_chat_endpoints_with_a_stubbed_agent(session, monkeypatch):
         'id="chat-box"' in client.get(f"/leads/{ALLIED}").text
         and client.get("/chat").status_code == 200
     )
+
+
+@pytest.mark.db
+def test_presets_go_through_the_one_chat_form(session):
+    """Regression: presets were separate forms with no visible feedback, so reps clicked Ask on
+    the empty box. They must be plain buttons the chat script copies into the single form."""
+    from fastapi.testclient import TestClient
+
+    from app.api import app
+
+    client = TestClient(app)
+    for url in ("/chat", f"/leads/{ALLIED}"):
+        html = client.get(url).text
+        box = html[html.index('id="chat-box"') :]
+        box = box[: box.index("<section") if "<section" in box else len(box)]
+        assert box.count("<form") == 1 and box.count("data-suggest=") == 3, url
+        assert "/static/chat.js" in html
+    js = client.get("/static/chat.js").text
+    assert "requestSubmit" in js and "htmx:responseError" in js and "msg-pending" in js
