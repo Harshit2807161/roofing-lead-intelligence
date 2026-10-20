@@ -170,7 +170,9 @@ def merge(listing_row: dict, profile: dict | None) -> ContractorRecord:
     row = {k: v for k, v in listing_row.items() if not k.startswith("_")}
     if profile is None:
         # No profile page (fetch failed): keep the listing fields.
-        return ContractorRecord(**row, street=street_from_address(listing_row), profile_fetched=False)
+        return ContractorRecord(
+            **row, street=street_from_address(listing_row), profile_fetched=False
+        )
 
     if profile.get("details_contractor_id") not in (None, row["gaf_id"]):
         raise ValueError(f"profile is for {profile['details_contractor_id']}, not {row['gaf_id']}")
