@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets and local config
+.env
+
+# Scraped data: raw snapshots stay on disk, never in git
+data/
+
+# Tool output
+.playwright-mcp/
+
+# Case brief (not ours to publish)
+*.pdf
+
+.DS_Store
