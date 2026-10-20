@@ -1,4 +1,4 @@
-{% from "macros.html" import lead_row, dna_head %}
+{% from "macros.html" import lead_row %}
 {% set any_scored = leads | selectattr("score") | list | length > 0 %}
 <div class="results-head">
   <span class="label">{{ leads | length }} lead{{ "s" if leads | length != 1 }}</span>
@@ -9,14 +9,6 @@
   </span>
 </div>
 {% if leads %}
-<div class="lead-list-head" aria-hidden="true">
-  <span></span><span></span>
-  <span class="label">Lead</span>
-  <span class="lead-explain">
-    {% if any_scored %}{{ dna_head(dna_groups) }}{% else %}<span class="label">Tags</span>{% endif %}
-  </span>
-  <span class="label lead-score">Score</span>
-</div>
 <ol class="lead-list card">
   {% for l in leads %}{{ lead_row(l) }}{% endfor %}
 </ol>
@@ -26,7 +18,5 @@
   <p class="muted"><a href="/">Clear filters</a> to see every lead.</p>
 </div>
 {% endif %}
-{% if any_scored %}
-<p class="dna-legend meta subtle"><span class="dna-key fill"></span>points earned <span class="dna-key empty"></span>not earned <span class="dna-key pen"></span>complaint penalty · segment width = the factor's cap (ten factors, 100 points) · hover a segment for the factor and reason</p>
-{% endif %}
+<p class="sig-legend meta subtle">Tags in sentence case come from the AI extraction step: each one exists only because a quote passed the verbatim check. Hover a tag to see its quote.</p>
 <script type="application/json" id="map-points">{{ leads | tojson }}</script>

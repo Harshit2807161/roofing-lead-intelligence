@@ -255,18 +255,30 @@ def test_insights_never_name_unverified_people(leads_db):
 
 
 @pytest.mark.db
-def test_score_dna_strip_matches_each_score(client, leads_db):
-    """The list's strip is the score, drawn: segment caps add to 100 and points add to the total."""
-    from html import escape
-
-    from app.web.data import DNA_GROUPS
-
-    html = client.get("/").text
-    assert html.count('class="dna"') == 85
-    assert all(escape(name) in html for name, _ in DNA_GROUPS)  # the page escapes "&"
-    assert sum(cap for _, cap in DNA_GROUPS) == 100
+def test_every_list_tag_quote_is_verbatim_in_the_source(leads_db):
+    """A semantic tag is only as good as its quote: it must be in the contractor's own text."""
+    norm = lambda t: " ".join(t.split()).lower()  # noqa: E731
     for row in list_leads(leads_db, Filters()):
-        segs = row["dna"]["segments"]
-        assert sum(s["cap"] for s in segs) == 100 and all(0 <= s["fill"] <= 100 for s in segs)
-        penalty = row["dna"]["penalty"]["points"] if row["dna"]["penalty"] else 0
-        assert abs(sum(s["points"] for s in segs) + penalty - row["score"]) < 0.11, row["gaf_id"]
+        c = leads_db.get(Contractor, row["gaf_id"])
+        sources = {"About": c.about or ""} | {
+            f"Review {n}": r.text for n, r in enumerate(c.reviews, 1)
+        }
+        for tag in row["tags"]:
+            assert norm(tag["quote"]) in norm(sources.get(tag["source"], "")), (row["gaf_id"], tag)
+
+
+@pytest.mark.db
+@pytest.mark.parametrize("key", ["storm", "warranty", "contact", "complaints", "trade:siding",
+                                 "signal:family_owned_business", "signal:competitive_pricing"])  # fmt: skip
+def test_tag_filter_matches_signals(client, leads_db, key):
+    from app.intel.tags import semantic_tags
+    from app.web.data import promoted_categories
+
+    promoted = promoted_categories(leads_db)
+    expected = {
+        s.gaf_id for s in leads_db.scalars(select(ContractorSignals))
+        if any(key in t["keys"] for t in semantic_tags(s.data, promoted))
+    }  # fmt: skip
+    got = {x["gaf_id"] for x in client.get("/api/leads", params={"tag": key}).json()["items"]}
+    assert got == expected and expected, key
+    assert f'value="{key}"' in client.get("/").text  # offered in the Signal filter menu

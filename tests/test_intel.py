@@ -141,3 +141,27 @@ def test_label_grouping_falls_back_and_ignores_invented_labels(monkeypatch):
     )
     assert out["storm_repair"] == out["storm_damage"] == ("storm_repair", "Storm work")
     assert out["financing"] == ("financing", "") and "made_up" not in out
+
+
+def test_semantic_tags_show_trades_promoted_categories_and_quotes():
+    from app.intel.tags import semantic_tags
+
+    data = {
+        "services": [{"service": "roofing", "quote": "q0", "source": "about"},
+                     {"service": "siding", "quote": "q1", "source": "about"},
+                     {"service": "gutters", "quote": "q2", "source": "review_1"}],
+        "other_signals": [{"category": "family_owned", "canonical": "family_owned_business", "quote": "q3", "source": "about"},
+                          {"category": "x", "canonical": "rare_thing", "quote": "q4", "source": "about"}],
+        "storm_or_insurance_work": {"quote": "q5", "source": "review_2"},
+        "gaf_warranty_mentions": [], "people": [], "complaints": [{"theme": "delays", "quote": "q6", "source": "review_3"}],
+    }  # fmt: skip
+    tags = semantic_tags(data, {"family_owned_business"})
+    assert [t["label"] for t in tags] == [
+        "Siding · Gutters",
+        "Family owned business",
+        "Storm & insurance",
+        "Complaints",
+    ]
+    assert tags[0]["keys"] == ["trade:siding", "trade:gutters"]  # roofing isn't a cross-sell trade
+    assert tags[1]["quote"] == "q3" and tags[2]["source"] == "Review 2"
+    assert all(t["key"] != "signal:rare_thing" for t in tags)  # not promoted, not shown

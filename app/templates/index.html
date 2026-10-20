@@ -84,6 +84,14 @@
     </label>
 
     <label class="field">
+      <span class="label">Signal</span>
+      <select name="tag">
+        <option value="">Any signal</option>
+        {% for t in tag_options %}<option value="{{ t.key }}" {% if filters.tag == t.key %}selected{% endif %}>{{ t.label }} ({{ t.count }})</option>{% endfor %}
+      </select>
+    </label>
+
+    <label class="field">
       <span class="label">Sort</span>
       <select name="sort">
         {% for key, text in sorts.items() %}<option value="{{ key }}" {% if filters.sort == key %}selected{% endif %}>{{ text }}</option>{% endfor %}

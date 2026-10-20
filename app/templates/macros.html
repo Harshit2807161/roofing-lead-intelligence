@@ -24,23 +24,13 @@
   {%- endif -%}
 {%- endmacro %}
 
-{% macro dna(d) -%}
-  {%- if d -%}
-  <span class="dna" role="img" aria-label="Score breakdown by factor">
-    {%- for seg in d.segments -%}
-      <span class="dna-seg{% if seg.points <= 0 %} is-empty{% endif %}" style="flex-grow: {{ seg.cap }}" title="{{ seg.title }}"><i style="width: {{ seg.fill }}%"></i></span>
-    {%- endfor -%}
-    {%- if d.penalty -%}<span class="dna-pen" style="flex-grow: {{ -d.penalty.points }}" title="{{ d.penalty.title }}"></span>{%- endif -%}
-  </span>
-  {%- else -%}
-  <span class="dna dna-none meta subtle">Not scored</span>
+{% macro signal_tags(tags, limit=3) -%}
+  {%- for t in tags[:limit] -%}
+    <span class="sig sig-{{ t.kind }}" tabindex="0">{{ t.label }}<span class="cite-pop" role="tooltip"><span class="cite-pop-label">{{ t.source }} · verified quote</span><span class="cite-pop-value">“{{ t.quote }}”</span></span></span>
+  {%- endfor -%}
+  {%- if tags | length > limit -%}
+    <span class="sig sig-more" tabindex="0">+{{ tags | length - limit }}<span class="cite-pop" role="tooltip"><span class="cite-pop-label">Also</span><span class="cite-pop-value">{{ tags[limit:] | map(attribute="label") | join(", ") }}</span></span></span>
   {%- endif -%}
-{%- endmacro %}
-
-{% macro dna_head(groups) -%}
-  <span class="dna dna-head" aria-hidden="true">
-    {%- for name, cap in groups -%}<span class="dna-group" style="flex-grow: {{ cap }}">{{ name }}</span>{%- endfor -%}
-  </span>
 {%- endmacro %}
 
 {% macro lead_row(l) -%}
@@ -60,13 +50,13 @@
       {%- endif %}
     </span>
     <span class="lead-explain">
-      {{ dna(l.dna) }}
       <span class="lead-tags">
         {{ play_tag(l.play) }}
         {{ pc_stars(l.presidents_club_stars) }}
         {% if l.commercial %}<span class="chip">Commercial</span>{% endif %}
         {% if l.insight_status == "needs_review" %}<span class="chip chip-warn">Needs review</span>{% endif %}
       </span>
+      {% if l.tags %}<span class="lead-signals">{{ signal_tags(l.tags) }}</span>{% endif %}
     </span>
     <span class="lead-score">{{ score_badge(l.score) }}</span>
   </a>

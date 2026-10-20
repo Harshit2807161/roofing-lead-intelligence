@@ -32,11 +32,15 @@ def lead_list(request: Request, session: SessionDep) -> HTMLResponse:
         "leads": data.list_leads(session, filters),
         "filters": filters,
         "center": _center(),
-        "dna_groups": data.DNA_GROUPS,
     }
     if _is_partial(request):
         return templates.TemplateResponse(request, "partials/lead_results.html", ctx)
-    ctx |= {"counts": data.summary_counts(session), "plays": data.PLAYS, "sorts": data.SORTS}
+    ctx |= {
+        "counts": data.summary_counts(session),
+        "plays": data.PLAYS,
+        "sorts": data.SORTS,
+        "tag_options": data.tag_options(session),
+    }
     return templates.TemplateResponse(request, "index.html", ctx)
 
 

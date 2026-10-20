@@ -13,7 +13,8 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.intel.insight import facts_for
-from app.models import Contractor, ContractorSignals, LeadInsight, LeadScore, Run
+from app.intel.tags import semantic_tags, tag_label
+from app.models import Contractor, ContractorSignals, LeadInsight, LeadScore, Run, SignalCategory
 
 PLAYS = [
     "Volume leader",
@@ -30,15 +31,6 @@ SORTS = {
     "reviews": "Review count",
 }
 PENALTY_SCALE = 10.0  # points; the width reference for negative factors
-# Score DNA strip: one segment per score factor, in scoring order, sized by the factor's cap.
-DNA_FACTORS = [
-    ("presidents_club", "Pres. Club", 20), ("review_volume", "Volume", 18), ("rating", "Rep.", 10),
-    ("activity", "Recent", 10), ("commercial", "Comm.", 12), ("specialties", "Spec.", 6),
-    ("multi_trade", "Trades", 8), ("established", "Est.", 6), ("named_contact", "Contact", 4),
-    ("proximity", "Prox.", 6),
-]  # fmt: skip
-# Header groups over the strip; caps add up to the same 100 as the segments beneath them.
-DNA_GROUPS = [("GAF award", 20), ("Reputation & activity", 38), ("Business fit", 42)]
 _SKIP_WORDS = {"the", "and", "&", "of", "inc", "inc.", "llc", "llc.", "co", "co.", "corp", "corp."}
 
 
@@ -54,6 +46,7 @@ class Filters:
     presidents_club: bool = False
     commercial: bool = False
     q: str | None = None
+    tag: str | None = None  # a semantic tag key, e.g. "storm" or "trade:siding"
     sort: str = "rank"
 
     @classmethod
@@ -69,6 +62,7 @@ class Filters:
             presidents_club=_flag(p.get("presidents_club")),
             commercial=_flag(p.get("commercial")),
             q=(p.get("q") or "").strip() or None,
+            tag=(p.get("tag") or "").strip() or None,
             sort=sort if sort in SORTS else "rank",
         )
 
@@ -99,9 +93,10 @@ def initials(name: str) -> str:
 
 def _lead_query(f: Filters) -> Select:
     stmt = (
-        select(Contractor, LeadScore, LeadInsight)
+        select(Contractor, LeadScore, LeadInsight, ContractorSignals)
         .outerjoin(LeadScore, LeadScore.gaf_id == Contractor.gaf_id)
         .outerjoin(LeadInsight, LeadInsight.gaf_id == Contractor.gaf_id)
+        .outerjoin(ContractorSignals, ContractorSignals.gaf_id == Contractor.gaf_id)
     )
     if f.state:
         stmt = stmt.where(Contractor.state == f.state)
@@ -128,33 +123,9 @@ def _lead_query(f: Filters) -> Select:
     return stmt.order_by(*order)
 
 
-def dna_strip(factors: list[dict] | None) -> dict[str, Any] | None:
-    """Segments for the list's score strip: fill = points / cap; complaints as a red tail."""
-    if not factors:
-        return None
-    by_key = {f["key"]: f for f in factors}
-    segments = []
-    for key, short, cap in DNA_FACTORS:
-        f = by_key.get(key, {})
-        points = float(f.get("points") or 0)
-        segments.append({
-            "short": short, "cap": cap, "points": points,
-            "fill": round(max(0.0, min(1.0, points / cap)) * 100, 1),
-            "title": f"{f.get('label', short)}: {points:g}/{cap} · {f.get('reason', '')}",
-        })  # fmt: skip
-    penalty = by_key.get("complaints")
-    return {
-        "segments": segments,
-        "penalty": {
-            "points": penalty["points"],
-            "title": f"Complaints {penalty['points']:g} · {penalty['reason']}",
-        }
-        if penalty
-        else None,
-    }
-
-
-def lead_row(c: Contractor, s: LeadScore | None, i: LeadInsight | None) -> dict[str, Any]:
+def lead_row(
+    c: Contractor, s: LeadScore | None, i: LeadInsight | None, tags: list[dict] | None = None
+) -> dict[str, Any]:
     """The fields one row of the ranked list needs (also the /api/leads item shape)."""
     return {
         "gaf_id": c.gaf_id,
@@ -176,14 +147,38 @@ def lead_row(c: Contractor, s: LeadScore | None, i: LeadInsight | None) -> dict[
         "ranked_by": "score" if s else "gaf",
         "score": s.total if s else None,
         "play": s.play if s else None,
-        "dna": dna_strip(s.factors) if s else None,
         "insight_status": i.status if i else None,
         "summary": (i.data or {}).get("summary") if i else None,
+        "tags": tags or [],
     }
 
 
+def promoted_categories(session: Session) -> frozenset[str]:
+    stmt = select(SignalCategory.name).where(SignalCategory.status == "promoted")
+    return frozenset(session.scalars(stmt))
+
+
 def list_leads(session: Session, f: Filters) -> list[dict[str, Any]]:
-    return [lead_row(c, s, i) for c, s, i in session.execute(_lead_query(f)).all()]
+    promoted = promoted_categories(session)
+    rows = [
+        lead_row(c, s, i, semantic_tags(sig.data if sig else None, promoted))
+        for c, s, i, sig in session.execute(_lead_query(f)).all()
+    ]
+    if f.tag:  # tags come from JSON signals, so this filter runs here rather than in SQL
+        rows = [r for r in rows if any(f.tag in t["keys"] for t in r["tags"])]
+    return rows
+
+
+def tag_options(session: Session) -> list[dict[str, Any]]:
+    """Every tag key present, with a label and how many leads carry it, for the filter menu."""
+    counts: dict[str, int] = {}
+    for row in list_leads(session, Filters()):
+        for key in {k for t in row["tags"] for k in t["keys"]}:
+            counts[key] = counts.get(key, 0) + 1
+    order = lambda k: (k.startswith("trade:"), -counts[k], k)  # noqa: E731 - signals first, then trades
+    return [
+        {"key": k, "label": tag_label(k), "count": counts[k]} for k in sorted(counts, key=order)
+    ]
 
 
 def summary_counts(session: Session) -> dict[str, Any]:
@@ -262,7 +257,7 @@ def lead_detail(session: Session, gaf_id: str) -> dict[str, Any] | None:
         x for x in [c.street, c.city, f"{c.state or ''} {c.postal_code or ''}"] if x
     )
     return {
-        **lead_row(c, s, i),
+        **lead_row(c, s, i, semantic_tags(sig.data if sig else None, promoted_categories(session))),
         "dba": c.dba,
         "address": address.strip(", "),
         "phone": c.display_phone or c.phone,
