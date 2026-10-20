@@ -1,0 +1,76 @@
+{# Shared components. Class names map one-to-one to app.css. #}
+
+{% macro score_badge(score, size="") -%}
+  {%- if score is not none -%}
+    <span class="score {{ size }}" title="Lead score out of 100">{{ score | round | int }}</span>
+  {%- else -%}
+    <span class="score score-empty {{ size }}" title="The scoring step hasn't reached this lead yet">Not scored</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro play_tag(play) -%}
+  {%- if play %}<span class="tag">{{ play }}</span>{% endif -%}
+{%- endmacro %}
+
+{% macro pc_stars(n) -%}
+  {%- if n %}<span class="chip chip-pc" title="GAF President's Club, {{ n }} star{{ 's' if n != 1 }}">President's Club <span class="star">{% for _ in range(n) %}★{% endfor %}</span></span>{% endif -%}
+{%- endmacro %}
+
+{% macro rating(value, count) -%}
+  {%- if value -%}
+    <span class="rating"><span class="star">★</span> {{ "%.1f" | format(value) }} <span class="subtle">({{ count }})</span></span>
+  {%- else -%}
+    <span class="rating subtle">No rating</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro lead_row(l) -%}
+<li>
+  <a class="lead-row{% if l.insight_status == 'needs_review' %} is-review{% endif %}" href="/leads/{{ l.gaf_id }}">
+    <span class="lead-rank" title="{{ 'Score rank' if l.ranked_by == 'score' else 'GAF directory order' }}">{{ l.rank }}</span>
+    <span class="avatar" aria-hidden="true">{{ l.initials }}</span>
+    <span class="lead-meta">
+      <span class="lead-name">{{ l.name }}</span>
+      <span class="lead-sub">
+        <span>{{ l.city }}, {{ l.state }}</span><span class="dot">·</span><span>{{ l.distance_mi | num }} mi</span><span class="dot">·</span>{{ rating(l.rating, l.review_count) }}
+      </span>
+      {% if l.summary -%}
+        <span class="lead-summary">{{ l.summary }}</span>
+      {%- else -%}
+        <span class="lead-summary pending">Insight pending</span>
+      {%- endif %}
+    </span>
+    <span class="lead-tags">
+      {{ pc_stars(l.presidents_club_stars) }}
+      {% if l.commercial %}<span class="chip">Commercial</span>{% endif %}
+      {% if l.insight_status == "needs_review" %}<span class="chip chip-warn">Needs review</span>{% endif %}
+      {{ play_tag(l.play) }}
+    </span>
+    <span class="lead-score">{{ score_badge(l.score) }}</span>
+  </a>
+</li>
+{%- endmacro %}
+
+{% macro cite_chips(keys, citemap) -%}
+  {%- for k in keys or [] %}
+    {%- set c = citemap.get(k) -%}
+    <span class="cite" tabindex="0" role="button" aria-label="Source: {{ c.label if c else k }}">{{ k | replace("_", " ") }}<span class="cite-pop" role="tooltip"><span class="cite-pop-label">{{ c.label if c else k }}</span><span class="cite-pop-value">{{ c.value if c else "Not in stored data" }}</span></span></span>
+  {%- endfor -%}
+{%- endmacro %}
+
+{% macro factor_bar(f, citemap) -%}
+<li class="factor">
+  <div class="factor-head">
+    <span class="factor-label">{{ f.label }}</span>
+    <span class="factor-points{% if f.negative %} neg{% endif %}">{{ f.points | num }}{% if f.max %}<span class="subtle"> / {{ f.max | num }}</span>{% endif %}</span>
+  </div>
+  <div class="bar" role="img" aria-label="{{ f.points | num }} of {{ f.max | num }} points">
+    <span class="bar-fill{% if f.negative %} neg{% endif %}" style="width: {{ f.pct }}%"></span>
+  </div>
+  {% if f.reason or f.cites %}<p class="factor-reason">{{ f.reason }} {{ cite_chips(f.cites, citemap) }}</p>{% endif %}
+</li>
+{%- endmacro %}
+
+{% macro review_stars(n) -%}
+  <span class="review-stars" aria-label="{{ n }} of 5 stars">{% for i in range(5) %}<span class="{{ 'on' if n and i < n else 'off' }}">★</span>{% endfor %}</span>
+{%- endmacro %}

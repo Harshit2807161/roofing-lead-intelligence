@@ -5,12 +5,16 @@ description = "Lead intelligence for a roofing distributor, built on GAF's publi
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "beautifulsoup4>=4.15.0",
+    "fastapi>=0.153.0",
     "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "openai>=3.35.1",
     "playwright>=1.64.0",
     "psycopg[binary]>=3.3.6",
     "pydantic>=2",
     "pydantic-settings>=2.16.1",
     "sqlalchemy>=2",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [tool.uv]
@@ -26,6 +30,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]  # the formatter owns line length; long docstrings and comments are fine
 
 [dependency-groups]
 dev = [

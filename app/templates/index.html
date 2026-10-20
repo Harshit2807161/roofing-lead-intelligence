@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% set active = "leads" %}
+{% block title %}Leads · Roofing Leads{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <span class="eyebrow"><span class="pip" aria-hidden="true"></span>Ranked leads</span>
+    <h1 class="h1">Roofing contractors near 10013</h1>
+    <p class="lead muted">GAF-recommended contractors within 25 miles of Manhattan, ranked for a distributor's sales rep.</p>
+  </div>
+  <button class="btn btn-secondary" type="button" data-map-toggle aria-pressed="false" aria-controls="map-panel">Show map</button>
+</section>
+
+<section class="stats" aria-label="Pipeline progress">
+  <div class="stat"><span class="label">Leads</span><span class="stat-num">{{ counts.leads }}</span></div>
+  <div class="stat"><span class="label">Scored</span><span class="stat-num">{{ counts.scored }}<small> / {{ counts.leads }}</small></span></div>
+  <div class="stat"><span class="label">Insights ok</span><span class="stat-num">{{ counts.insights_ok }}</span></div>
+  <div class="stat"><span class="label">Needs review</span><span class="stat-num{% if counts.insights_review %} warn{% endif %}">{{ counts.insights_review }}</span></div>
+  <div class="stat stat-run">
+    <span class="label">Last run</span>
+    {% if counts.latest_run %}
+      <span class="stat-text"><span class="status status-{{ counts.latest_run.status }}">{{ counts.latest_run.status }}</span> {{ counts.latest_run.started_at | date("%b %-d, %H:%M UTC") }}</span>
+      <span class="meta subtle">{{ counts.latest_run.parsed }} parsed · {{ counts.latest_run.failed }} failed</span>
+    {% else %}
+      <span class="stat-text subtle">No runs yet</span>
+    {% endif %}
+  </div>
+</section>
+
+{% if counts.scored == 0 %}
+<p class="notice"><span class="pip pip-muted" aria-hidden="true"></span>Not scored yet. Leads are shown in GAF's directory order until the scoring step runs.</p>
+{% endif %}
+
+<div class="list-layout">
+  <form class="filters card" action="/" method="get"
+        hx-get="/" hx-target="#lead-results" hx-trigger="input delay:250ms, submit"
+        hx-push-url="true" hx-indicator="#lead-results">
+    <div class="filters-head">
+      <span class="label">Filters</span>
+      <a class="link-quiet meta" href="/">Reset</a>
+    </div>
+
+    <label class="field">
+      <span class="label">Name</span>
+      <input type="search" name="q" value="{{ filters.q or '' }}" placeholder="Search contractors" autocomplete="off">
+    </label>
+
+    <fieldset class="field">
+      <legend class="label">State</legend>
+      <div class="segmented">
+        {% for value, text in [("", "All"), ("NJ", "NJ"), ("NY", "NY")] %}
+        <label><input type="radio" name="state" value="{{ value }}" {% if (filters.state or "") == value %}checked{% endif %}><span>{{ text }}</span></label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <label class="field">
+      <span class="label">Max distance</span>
+      <select name="max_distance">
+        <option value="">Any (25 mi)</option>
+        {% for d in [5, 10, 15, 20] %}<option value="{{ d }}" {% if filters.max_distance == d %}selected{% endif %}>Within {{ d }} mi</option>{% endfor %}
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="label">Min rating</span>
+      <select name="min_rating">
+        <option value="">Any</option>
+        {% for r in [4.0, 4.5, 4.8] %}<option value="{{ r }}" {% if filters.min_rating == r %}selected{% endif %}>{{ r }}★ and up</option>{% endfor %}
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="label">Min score</span>
+      <select name="min_score">
+        <option value="">Any</option>
+        {% for s in [50, 60, 70, 80] %}<option value="{{ s }}" {% if filters.min_score == s %}selected{% endif %}>{{ s }}+</option>{% endfor %}
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="label">Play</span>
+      <select name="play">
+        <option value="">Any play</option>
+        {% for p in plays %}<option value="{{ p }}" {% if filters.play == p %}selected{% endif %}>{{ p }}</option>{% endfor %}
+      </select>
+    </label>
+
+    <div class="field checks">
+      <label class="check"><input type="checkbox" name="presidents_club" value="1" {% if filters.presidents_club %}checked{% endif %}><span>President's Club only</span></label>
+      <label class="check"><input type="checkbox" name="commercial" value="1" {% if filters.commercial %}checked{% endif %}><span>Commercial-certified only</span></label>
+    </div>
+
+    <label class="field">
+      <span class="label">Sort by</span>
+      <select name="sort">
+        {% for key, text in sorts.items() %}<option value="{{ key }}" {% if filters.sort == key %}selected{% endif %}>{{ text }}</option>{% endfor %}
+      </select>
+    </label>
+
+    <noscript><button class="btn btn-primary" type="submit">Apply</button></noscript>
+  </form>
+
+  <div class="results-col">
+    <div id="map-panel" class="map-panel card" hidden>
+      <div id="lead-map" class="lead-map" data-center="{{ center | tojson | forceescape }}"></div>
+      <div class="map-legend meta">
+        <span><i class="dot-legend high"></i>Score 70+</span>
+        <span><i class="dot-legend mid"></i>50–69</span>
+        <span><i class="dot-legend low"></i>Under 50</span>
+        <span><i class="dot-legend none"></i>Not scored</span>
+        <span><i class="dot-legend origin"></i>ZIP 10013</span>
+      </div>
+    </div>
+    <div id="lead-results" class="lead-results">
+      {% include "partials/lead_results.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="/static/app.js" defer></script>
+{% endblock %}

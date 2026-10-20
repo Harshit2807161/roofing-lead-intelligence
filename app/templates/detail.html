@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% from "macros.html" import score_badge, play_tag, pc_stars, rating, cite_chips, factor_bar, review_stars %}
+{% set active = "leads" %}
+{% set cm = lead.citations %}
+{% set ins = lead.insight %}
+{% set d = ins.data if ins else {} %}
+{% block title %}{{ lead.name }} · Roofing Leads{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+
+{% block content %}
+<a class="back meta" href="/">&larr; All leads</a>
+
+{% if ins and ins.status == "needs_review" %}
+<div class="banner banner-warn" role="status">
+  <strong class="label">Needs review</strong>
+  <span>This insight failed validation twice. Check every claim against its citation before using it on a call.</span>
+  {% if ins.validation_errors %}
+  <ul class="banner-errors meta">{% for e in ins.validation_errors[:5] %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+</div>
+{% endif %}
+
+<header class="detail-head card">
+  <div class="detail-id">
+    {% if lead.logo_url %}
+      <span class="avatar avatar-lg avatar-logo"><img src="{{ lead.logo_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('avatar-logo');this.parentElement.textContent='{{ lead.initials }}'"></span>
+    {% else %}
+      <span class="avatar avatar-lg" aria-hidden="true">{{ lead.initials }}</span>
+    {% endif %}
+    <div class="detail-title">
+      <span class="eyebrow">{% if lead.ranked_by == "score" %}Rank {{ lead.rank }}{% else %}GAF #{{ lead.gaf_rank }}{% endif %} · {{ lead.city }}, {{ lead.state }} · {{ lead.distance_mi | num }} mi</span>
+      <h1 class="h1">{{ lead.name }}</h1>
+      {% if lead.dba %}<p class="muted meta">DBA {{ lead.dba }}</p>{% endif %}
+      <p class="muted">{{ lead.address }}</p>
+      <div class="tag-row">
+        {{ play_tag(lead.play) }}
+        {{ pc_stars(lead.presidents_club_stars) }}
+        {% if lead.commercial %}<span class="chip">Commercial</span>{% endif %}
+        {% for cert in lead.residential_certs if "Master Elite" in cert %}<span class="chip">Master Elite</span>{% endfor %}
+      </div>
+    </div>
+    <div class="detail-score">
+      <span class="label">Lead score</span>
+      {{ score_badge(lead.score, "score-lg") }}
+      {% if lead.score_detail %}<span class="meta subtle">Rank {{ lead.score_detail.rank }} · model {{ lead.score_detail.version }}</span>{% endif %}
+    </div>
+  </div>
+
+  <dl class="facts">
+    <div><dt class="label">Phone</dt><dd>{% if lead.phone %}<a href="tel:{{ lead.phone }}">{{ lead.phone }}</a>{% else %}<span class="subtle">Not listed</span>{% endif %}</dd></div>
+    <div><dt class="label">Website</dt><dd>{% if lead.website %}<a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.website | replace("https://", "") | replace("http://", "") | trim("/") }}</a>{% else %}<span class="subtle">Not listed</span>{% endif %}</dd></div>
+    <div><dt class="label">GAF profile</dt><dd><a href="{{ lead.profile_url }}" target="_blank" rel="noopener">gaf.com &nearr;</a></dd></div>
+    <div><dt class="label">Rating</dt><dd>{{ rating(lead.rating, lead.review_count) }}</dd></div>
+    <div><dt class="label">License</dt><dd>{{ lead.license_number or "Not listed" }}</dd></div>
+    <div><dt class="label">In business since</dt><dd>{{ lead.in_business_since or "Not listed" }}</dd></div>
+    <div><dt class="label">Employees</dt><dd>{{ lead.employees_band or "Not listed" }}</dd></div>
+  </dl>
+</header>
+
+<div class="detail-grid">
+  <div class="main-col">
+    <section class="card section-card" aria-labelledby="insight-h">
+      <div class="section-head">
+        <h2 class="h3" id="insight-h">Insight</h2>
+        {% if d.get("confidence") %}<span class="chip conf conf-{{ d.confidence }}">{{ d.confidence }} confidence</span>{% endif %}
+      </div>
+      {% if not ins %}
+        <p class="pending-block"><span class="pip pip-muted" aria-hidden="true"></span>Insight pending. The writing step hasn't reached this lead yet; the facts, score and reviews below are already usable.</p>
+      {% else %}
+        {% if d.get("summary") %}<p class="lead">{{ d.summary }}</p>{% endif %}
+
+        {% if d.get("next_action") %}
+        <div class="next-action">
+          <span class="label">Next action</span>
+          <p>{{ d.next_action }}</p>
+        </div>
+        {% endif %}
+
+        {% for key, title in [("why_fit", "Why it fits"), ("signals", "Signals"), ("talking_points", "Talking points")] %}
+          {% set items = d.get(key) or [] %}
+          {% if items %}
+          <div class="insight-block">
+            <h3 class="label">{{ title }}</h3>
+            <ul class="claims">
+              {% for item in items %}<li><span>{{ item.text }}</span> {{ cite_chips(item.cites, cm) }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {% set people = d.get("decision_makers") or [] %}
+        <div class="insight-block">
+          <h3 class="label">Decision makers</h3>
+          {% if people %}
+          <ul class="people">
+            {% for p in people %}
+            <li class="person">
+              <span class="avatar avatar-sm" aria-hidden="true">{{ p.name[:1] }}</span>
+              <div>
+                <p class="person-name">{{ p.name }}{% if p.role %} <span class="subtle">· {{ p.role }}</span>{% endif %}</p>
+                {% if p.quote %}<blockquote class="quote">&ldquo;{{ p.quote }}&rdquo; {{ cite_chips([p.cite] if p.cite else [], cm) }}</blockquote>{% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="muted meta">No named people in the About text or reviews.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="card section-card" aria-labelledby="score-h">
+      <div class="section-head">
+        <h2 class="h3" id="score-h">Score breakdown</h2>
+        {% if lead.score_detail %}<span class="meta subtle">{{ lead.score_detail.total | num }} of 100 points</span>{% endif %}
+      </div>
+      {% if lead.score_detail %}
+        <ul class="factors">{% for f in lead.score_detail.factors %}{{ factor_bar(f, cm) }}{% endfor %}</ul>
+      {% else %}
+        <p class="pending-block"><span class="pip pip-muted" aria-hidden="true"></span>Not scored yet. This lead sits at GAF directory position {{ lead.gaf_rank }} until the scoring step runs.</p>
+      {% endif %}
+    </section>
+
+    <section class="card section-card" aria-labelledby="reviews-h">
+      <div class="section-head">
+        <h2 class="h3" id="reviews-h">Reviews</h2>
+        <span class="meta subtle">Newest {{ lead.reviews | length }} of {{ lead.review_count }} on Google, as shown on GAF</span>
+      </div>
+      {% if lead.reviews %}
+      <ol class="reviews">
+        {% for r in lead.reviews %}
+        <li class="review" id="{{ r.cite }}">
+          <div class="review-head">
+            <span class="avatar avatar-sm" aria-hidden="true">{{ (r.author_initials or "?") | replace(".", "") }}</span>
+            {{ review_stars(r.rating) }}
+            <span class="meta subtle">{{ r.published_at | date }} · {{ r.source or "Google" }}</span>
+            <span class="cite cite-static">{{ r.cite | replace("_", " ") }}</span>
+          </div>
+          <p class="review-text">{{ r.text }}</p>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+        <p class="muted">No reviews stored for this contractor.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <aside class="side-col">
+    <section class="card section-card map-card">
+      <div id="detail-map" class="mini-map" data-lat="{{ lead.lat }}" data-lng="{{ lead.lng }}" data-name="{{ lead.name }}" data-center="{{ center | tojson | forceescape }}"></div>
+      <p class="meta subtle">{{ lead.distance_mi | num }} mi from ZIP 10013</p>
+    </section>
+
+    <section class="card section-card" aria-labelledby="about-h">
+      <h2 class="h3" id="about-h">About</h2>
+      {% if lead.about %}<p class="about-text">{{ lead.about }}</p>{% else %}<p class="muted">No About text on the GAF profile.</p>{% endif %}
+    </section>
+
+    <section class="card section-card" aria-labelledby="certs-h">
+      <h2 class="h3" id="certs-h">Certifications</h2>
+      {% for group, items in [("Residential", lead.residential_certs), ("Commercial", lead.commercial_certs), ("Commercial systems", lead.commercial_technologies), ("Specialties", lead.specialties)] %}
+        {% if items %}
+        <div class="cert-group">
+          <span class="label">{{ group }}</span>
+          <div class="tag-row">{% for x in items %}<span class="chip chip-quiet">{{ x }}</span>{% endfor %}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+    <p class="meta subtle source-note">Source: GAF contractor profile, updated {{ lead.updated_at | date }}. <a href="/api/leads/{{ lead.gaf_id }}">JSON</a></p>
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="/static/app.js" defer></script>
+{% endblock %}

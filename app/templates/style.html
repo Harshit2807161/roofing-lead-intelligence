@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% from "macros.html" import score_badge, play_tag, pc_stars, rating, cite_chips, factor_bar, lead_row, review_stars %}
+{% set active = "style" %}
+{% block title %}Style card · Roofing Leads{% endblock %}
+
+{% set demo_cites = {
+  "rating": {"label": "Rating", "value": "4.9★ across 283 Google reviews"},
+  "review_1": {"label": "Review 1 · Aug 26, 2026 · 5★", "value": "We recently had our roof replaced with upgraded GAF materials to qualify for the Golden Pledge warranty, along with new skylights and gutters."},
+  "about": {"label": "About (GAF profile)", "value": "Since its founding in 1996, Allied Brothers Home Corporation has become one of the largest and fastest-growing companies in New Jersey's tri-state area."},
+} %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <span class="eyebrow"><span class="pip" aria-hidden="true"></span>Style card</span>
+    <h1 class="h1">InstaLILY tokens, applied to a rep UI</h1>
+    <p class="lead muted">Values lifted from instalily.ai's own stylesheets: DM Mono for body and labels, IBM Plex Sans for display, near-black ink on warm paper, one green accent. Tokens live in <code>/static/tokens.css</code>.</p>
+  </div>
+</section>
+
+<div class="style-grid">
+  <section class="card section-card">
+    <h2 class="label">Type</h2>
+    <div class="type-specimen">
+      <div><span class="meta subtle">Hero · Plex Sans 400</span><p class="hero">Every lead, ranked.</p></div>
+      <div><span class="meta subtle">H1 · Plex Sans 400</span><p class="h1">Roofing contractors near 10013</p></div>
+      <div><span class="meta subtle">H2</span><p class="h2">Score breakdown</p></div>
+      <div><span class="meta subtle">H3</span><p class="h3">Why it fits</p></div>
+      <div><span class="meta subtle">Lead · Plex Sans</span><p class="lead">High-volume Master Elite shop with two President's Club stars and steady reviews.</p></div>
+      <div><span class="meta subtle">Body · DM Mono 400</span><p>Wayne, NJ · 18.7 mi · 4.9★ (283)</p></div>
+      <div><span class="meta subtle">Label · DM Mono, uppercase, 0.09em</span><p class="label">Next action</p></div>
+      <div><span class="meta subtle">Meta · DM Mono 11px</span><p class="meta">Newest 3 of 283 on Google</p></div>
+    </div>
+  </section>
+
+  <section class="card section-card">
+    <h2 class="label">Colour</h2>
+    <ul class="swatches">
+      {% for name, token, hex in [
+        ("Ink", "--brand-ink", "#0a0a0a"),
+        ("Paper", "--brand-paper", "#ffffff"),
+        ("Paper 2 (page)", "--brand-paper-2", "#f2f3ec"),
+        ("Paper 3 (sunken)", "--brand-paper-3", "#e9eae0"),
+        ("Border", "--brand-border-light", "#e4e4df"),
+        ("Border soft", "--brand-border-secondary", "#edeee8"),
+        ("Fg muted", "--brand-fg-muted", "#565656"),
+        ("Fg subtle", "--brand-fg-subtle", "#6f6f6f"),
+        ("Surface 750", "--brand-surface-750", "#262626"),
+        ("Green (accent)", "--brand-green", "#2e6b45"),
+        ("Green deep", "--brand-green-deep", "#193a29"),
+        ("Sage", "--brand-sage", "#8fb29c"),
+        ("Red (penalty)", "--brand-red", "#a8334c"),
+        ("Amber (review)", "--brand-amber", "#e08a45"),
+      ] %}
+      <li class="swatch"><span class="swatch-chip" style="background: var({{ token }})"></span><span class="swatch-name">{{ name }}</span><span class="meta subtle">{{ token }} · {{ hex }}</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="card section-card">
+    <h2 class="label">Buttons</h2>
+    <div class="row-wrap">
+      <button class="btn btn-primary" type="button">Prep for call</button>
+      <button class="btn btn-secondary" type="button">Show map</button>
+      <button class="btn btn-ghost" type="button">Reset</button>
+      <button class="btn btn-primary btn-sm" type="button">Apply</button>
+    </div>
+    <h2 class="label">Fields</h2>
+    <div class="row-wrap">
+      <label class="field"><span class="label">Name</span><input type="search" placeholder="Search contractors"></label>
+      <label class="field"><span class="label">Play</span><select><option>Any play</option></select></label>
+      <div class="segmented"><label><input type="radio" name="s" checked><span>All</span></label><label><input type="radio" name="s"><span>NJ</span></label><label><input type="radio" name="s"><span>NY</span></label></div>
+    </div>
+  </section>
+
+  <section class="card section-card">
+    <h2 class="label">Chips, tags, scores</h2>
+    <div class="row-wrap">
+      {{ play_tag("Volume leader") }} {{ play_tag("Commercial cross-sell") }}
+      {{ pc_stars(2) }} <span class="chip">Commercial</span> <span class="chip chip-warn">Needs review</span>
+    </div>
+    <div class="row-wrap">
+      <span class="chip conf conf-high">high confidence</span>
+      <span class="chip conf conf-medium">medium confidence</span>
+      <span class="chip conf conf-low">low confidence</span>
+    </div>
+    <div class="row-wrap">
+      {{ score_badge(86.5) }} {{ score_badge(54) }} {{ score_badge(none) }} {{ score_badge(91, "score-lg") }}
+    </div>
+    <p>Citation chips (hover or focus): Golden Pledge job in a recent review {{ cite_chips(["review_1", "about", "rating"], demo_cites) }}</p>
+  </section>
+
+  <section class="card section-card span-2">
+    <h2 class="label">Lead rows (InstaProspect precedent)</h2>
+    <ol class="lead-list lead-list-flat">
+      {{ lead_row(sample) }}
+      {{ lead_row({"gaf_id": "0", "name": "Trinity Exteriors LLC", "initials": "TE", "city": "Hoboken", "state": "NJ", "distance_mi": 2.4, "rating": 4.7, "review_count": 41, "presidents_club_stars": 0, "commercial": false, "rank": 2, "ranked_by": "gaf", "score": none, "play": none, "insight_status": none, "summary": none}) }}
+    </ol>
+  </section>
+
+  <section class="card section-card">
+    <h2 class="label">Factor bars</h2>
+    <ul class="factors">
+      {{ factor_bar({"label": "Job volume (reviews)", "points": 16.2, "max": 18, "pct": 90, "negative": false, "reason": "283 reviews, top decile in the circle", "cites": ["rating"]}, demo_cites) }}
+      {{ factor_bar({"label": "Commercial capability", "points": 8, "max": 12, "pct": 66.7, "negative": false, "reason": "Commercial certified (Single-Ply Roofer)", "cites": []}, demo_cites) }}
+      {{ factor_bar({"label": "Complaints in reviews", "points": -3, "max": 0, "pct": 30, "negative": true, "reason": "delays", "cites": ["review_1"]}, demo_cites) }}
+    </ul>
+  </section>
+
+  <section class="card section-card">
+    <h2 class="label">Banners and cards</h2>
+    <div class="banner banner-warn"><strong class="label">Needs review</strong><span>This insight failed validation twice.</span></div>
+    <div class="next-action"><span class="label">Next action</span><p>Call the office before Friday and offer a Golden Pledge-ready bundle.</p></div>
+    <p class="pending-block"><span class="pip pip-muted" aria-hidden="true"></span>Insight pending.</p>
+    <div class="review-head">{{ review_stars(4) }}<span class="meta subtle">Aug 26, 2026 · Google</span></div>
+  </section>
+</div>
+{% endblock %}

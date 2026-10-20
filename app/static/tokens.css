@@ -1,0 +1,209 @@
+/*
+  Design tokens for the rep UI, lifted from instalily.ai's own stylesheets (saved homepage and
+  InstaProspect pages, Oct 2026). Three layers: primitive (raw brand values, same names as the
+  site's --brand-* variables) -> semantic (what a value is for) -> component (one component's knobs).
+  Components read semantic or component tokens only, never primitives or raw hex.
+*/
+
+/* ---------- 1. Primitive ---------- */
+:root {
+  /* Type: the site's --font-mono is DM Mono, --font-display is IBM Plex Sans. */
+  --brand-font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --brand-font-display: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+
+  /* Neutrals: near-black ink on white and warm off-white paper. */
+  --brand-ink: #0a0a0a;
+  --brand-ink-90: #0a0a0ae6;
+  --brand-ink-78: #0a0a0ac7;
+  --brand-ink-45: #0a0a0a73;
+  --brand-ink-08: #0a0a0a14;
+  --brand-paper: #ffffff;
+  --brand-paper-2: #f2f3ec;
+  --brand-paper-3: #e9eae0;
+  --brand-fg-muted: #565656;
+  --brand-fg-subtle: #6f6f6f;
+  --brand-border-light: #e4e4df;
+  --brand-border-secondary: #edeee8;
+  --brand-surface-900: #0a0a0a;
+  --brand-surface-850: #141414;
+  --brand-surface-800: #1e1e1e;
+  --brand-surface-750: #262626;
+  --brand-border-dark: #2c2c2c;
+  --brand-hover: #f0f3ee;
+  --brand-selected: #eaefea;
+
+  /* The one accent: InstaLILY green, with sage as its soft partner. */
+  --brand-green: #2e6b45;
+  --brand-green-deep: #193a29;
+  --brand-green-12: #2e6b451f;
+  --brand-green-11: rgba(46, 107, 69, 0.11);
+  --brand-green-06: #2e6b450f;
+  --brand-sage: #8fb29c;
+  --brand-sage-10: #8fb29c1a;
+  --brand-sage-mute: #9aa388;
+
+  /* Status hues from the site's product mockups (used sparingly). */
+  --brand-red: #a8334c;
+  --brand-amber: #e08a45;
+  --brand-gold: #e8c341;
+  --brand-blue: #286486;
+
+  /* Type scale: the site's compact (product) scale. */
+  --brand-fs-hero: clamp(26px, 3vw, 36px);
+  --brand-fs-h1: clamp(23px, 2.5vw, 30px);
+  --brand-fs-h2: clamp(19px, 2vw, 24px);
+  --brand-fs-h3: clamp(16px, 1.5vw, 19px);
+  --brand-fs-stat: clamp(20px, 1.9vw, 26px);
+  --brand-fs-title: clamp(14px, 1.05vw, 16px);
+  --brand-fs-lead: clamp(14px, 1vw, 15.5px);
+  --brand-fs-body: clamp(13px, 0.9vw, 14px);
+  --brand-fs-label: 11px;
+  --brand-fs-meta: 11px;
+  --brand-ls-hero: -0.02em;
+  --brand-ls-h1: -0.015em;
+  --brand-ls-label: 0.09em;
+  --brand-ls-label-wide: 0.16em;
+
+  /* Shape. */
+  --brand-r-pill: 999px;
+  --brand-r-card: 18px;
+  --brand-r-panel: 20px;
+  --brand-r-cta: 12px;
+  --brand-r-field: 12px;
+  --brand-r-avatar: 10px;
+  --brand-r-sm: 6px;
+
+  /* Motion. */
+  --brand-dur-1: 0.18s;
+  --brand-dur-2: 0.24s;
+  --brand-dur-3: 0.42s;
+  --brand-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --brand-ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+/* ---------- 2. Semantic ---------- */
+:root {
+  color-scheme: light;
+
+  --font-mono: var(--brand-font-mono);
+  --font-display: var(--brand-font-display);
+
+  --bg-page: var(--brand-paper-2);
+  --bg-surface: var(--brand-paper);
+  --bg-sunken: var(--brand-paper-3);
+  --bg-hover: var(--brand-hover);
+  --bg-selected: var(--brand-selected);
+  --bg-inverse: var(--brand-ink);
+
+  --fg: var(--brand-ink);
+  --fg-muted: var(--brand-fg-muted);
+  --fg-subtle: var(--brand-fg-subtle);
+  --fg-inverse: var(--brand-paper);
+  --fg-inverse-muted: #c7c7c7;
+
+  --border: var(--brand-border-light);
+  --border-soft: var(--brand-border-secondary);
+  --border-strong: var(--brand-ink);
+  --border-hover: var(--brand-ink-08);
+
+  --accent: var(--brand-green);
+  --accent-deep: var(--brand-green-deep);
+  --accent-soft: var(--brand-green-11);
+  --accent-faint: var(--brand-green-06);
+  --accent-glow: var(--brand-sage);
+
+  --danger: var(--brand-red);
+  --danger-soft: #a8334c14;
+  --warn: var(--brand-amber);
+  --warn-soft: #e08a451f;
+  --star: var(--brand-gold);
+
+  --fs-hero: var(--brand-fs-hero);
+  --fs-h1: var(--brand-fs-h1);
+  --fs-h2: var(--brand-fs-h2);
+  --fs-h3: var(--brand-fs-h3);
+  --fs-stat: var(--brand-fs-stat);
+  --fs-title: var(--brand-fs-title);
+  --fs-lead: var(--brand-fs-lead);
+  --fs-body: var(--brand-fs-body);
+  --fs-label: var(--brand-fs-label);
+  --fs-meta: var(--brand-fs-meta);
+  --ls-hero: var(--brand-ls-hero);
+  --ls-h1: var(--brand-ls-h1);
+  --ls-label: var(--brand-ls-label);
+  --ls-label-wide: var(--brand-ls-label-wide);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --gutter: clamp(16px, 3vw, 40px);
+  --page-max: 1320px;
+
+  --r-pill: var(--brand-r-pill);
+  --r-card: var(--brand-r-card);
+  --r-panel: var(--brand-r-panel);
+  --r-field: var(--brand-r-field);
+  --r-sm: var(--brand-r-sm);
+
+  --dur-1: var(--brand-dur-1);
+  --dur-2: var(--brand-dur-2);
+  --ease-out: var(--brand-ease-out);
+  --ease-spring: var(--brand-ease-spring);
+}
+
+/* ---------- 3. Component ---------- */
+:root {
+  /* Buttons: the site's CTA (mono, uppercase, 12px radius), ink-filled or outlined. */
+  --btn-font: var(--font-mono);
+  --btn-radius: var(--brand-r-cta);
+  --btn-pad: 10px 16px;
+  --btn-fs: 12px;
+  --btn-ls: 0.04em;
+  --btn-primary-bg: var(--bg-inverse);
+  --btn-primary-fg: var(--fg-inverse);
+  --btn-secondary-bg: var(--bg-surface);
+  --btn-secondary-fg: var(--fg);
+  --btn-secondary-ring: inset 0 0 0 1px rgba(10, 10, 10, 0.2);
+
+  /* Cards: white on paper-2, hairline border, 18px radius; border goes ink on hover. */
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border);
+  --card-radius: var(--r-card);
+  --card-pad: clamp(18px, 1.8vw, 26px);
+
+  /* InstaProspect lead row: rank, ink initials tile, name + sub line, green score pill. */
+  --row-hover: var(--bg-hover);
+  --row-border: var(--border-soft);
+  --avatar-bg: var(--bg-inverse);
+  --avatar-fg: var(--fg-inverse);
+  --avatar-radius: var(--brand-r-avatar);
+  --score-bg: var(--accent-soft);
+  --score-fg: var(--accent);
+  --score-empty-bg: var(--bg-page);
+  --score-empty-fg: var(--fg-muted);
+
+  /* Tags and chips: green outline for the play, hairline for facts. */
+  --tag-fg: var(--accent);
+  --tag-border: var(--accent);
+  --chip-fg: var(--fg-muted);
+  --chip-border: var(--border);
+  --cite-bg: var(--accent-faint);
+  --cite-fg: var(--accent);
+  --cite-border: var(--brand-green-12);
+  --pop-bg: var(--bg-inverse);
+  --pop-fg: var(--fg-inverse);
+
+  /* Fields. */
+  --field-bg: var(--bg-surface);
+  --field-border: var(--border);
+  --field-radius: var(--r-field);
+
+  /* Factor bars. */
+  --bar-track: var(--bg-sunken);
+  --bar-fill: var(--accent);
+  --bar-neg: var(--danger);
+}

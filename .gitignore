@@ -18,3 +18,6 @@ data/
 *.pdf
 
 .DS_Store
+
+# LLM traces (contain contractor data; local only)
+traces/

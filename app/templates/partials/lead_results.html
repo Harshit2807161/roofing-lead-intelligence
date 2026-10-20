@@ -1,0 +1,21 @@
+{% from "macros.html" import lead_row %}
+{% set any_scored = leads | selectattr("score") | list | length > 0 %}
+<div class="results-head">
+  <span class="label">{{ leads | length }} lead{{ "s" if leads | length != 1 }}</span>
+  <span class="meta subtle">
+    {%- if filters.sort != "rank" %}Sorted by {{ filters.sort }}
+    {%- elif any_scored %}Ranked by lead score
+    {%- else %}GAF directory order · not scored yet{% endif -%}
+  </span>
+</div>
+{% if leads %}
+<ol class="lead-list card">
+  {% for l in leads %}{{ lead_row(l) }}{% endfor %}
+</ol>
+{% else %}
+<div class="empty card">
+  <p class="h3">No leads match these filters.</p>
+  <p class="muted"><a href="/">Clear filters</a> to see every lead.</p>
+</div>
+{% endif %}
+<script type="application/json" id="map-points">{{ leads | tojson }}</script>
