@@ -12,6 +12,7 @@ from typing import Any
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.intel.insight import facts_for
 from app.models import Contractor, ContractorSignals, LeadInsight, LeadScore, Run
 
 PLAYS = [
@@ -176,40 +177,19 @@ def _factor_view(f: dict[str, Any]) -> dict[str, Any]:
     return {**f, "pct": round(pct, 1), "negative": negative, "cites": f.get("cites") or []}
 
 
+# Display labels for the fact keys the insight writer cites (keys come from insight.facts_for).
+CITE_LABELS = {
+    "name": "Name", "location": "Location", "distance": "Distance", "certifications": "GAF certifications",
+    "rating": "Rating", "presidents_club": "President's Club", "commercial_certs": "Commercial certs",
+    "specialties": "Specialties", "in_business_since": "In business since", "employees": "Employees",
+    "website": "Website", "license": "License", "about": "About (GAF profile)",
+}  # fmt: skip
+
+
 def citations(c: Contractor, s: LeadScore | None, reviews: list[dict]) -> dict[str, dict]:
-    """What each cite key points at, so a chip can show the source value on hover."""
-    stars = c.presidents_club_stars
-    cites: dict[str, dict] = {
-        "rating": {
-            "label": "Rating",
-            "value": f"{c.rating or '—'}★ across {c.review_count} Google reviews",
-        },
-        "presidents_club": {
-            "label": "President's Club",
-            "value": f"{stars} star{'s' if stars != 1 else ''}"
-            if stars
-            else "Not a President's Club member",
-        },
-        "commercial_certs": {
-            "label": "Commercial certs",
-            "value": ", ".join(c.commercial_certs + c.commercial_technologies) or "None listed",
-        },
-        "residential_certs": {
-            "label": "Residential certs",
-            "value": ", ".join(c.residential_certs) or "None listed",
-        },
-        "specialties": {"label": "Specialties", "value": ", ".join(c.specialties) or "None listed"},
-        "about": {"label": "About (GAF profile)", "value": c.about or "No About text"},
-        "in_business_since": {
-            "label": "In business since",
-            "value": str(c.in_business_since) if c.in_business_since else "Not listed",
-        },
-        "distance": {"label": "Distance", "value": f"{c.distance_mi} mi from ZIP 10013"},
-        "website": {"label": "Website", "value": c.website or "Not listed"},
-        "employees": {"label": "Employees", "value": c.employees_band or "Not listed"},
-        "license": {"label": "License", "value": c.license_number or "Not listed"},
-        "phone": {"label": "Phone", "value": c.phone or "Not listed"},
-    }
+    """What each cite key points at, so a chip shows the source value on hover. Built from the same
+    facts the insight writer saw (insight.facts_for), so a chip can never point at nothing."""
+    cites = {k: {"label": CITE_LABELS.get(k, k), "value": v} for k, v in facts_for(c).items()}
     if s:
         cites["score"] = {"label": "Lead score", "value": f"{s.total:g}/100, rank #{s.rank}"}
     for r in reviews:
