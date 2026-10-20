@@ -24,6 +24,25 @@
   {%- endif -%}
 {%- endmacro %}
 
+{% macro dna(d) -%}
+  {%- if d -%}
+  <span class="dna" role="img" aria-label="Score breakdown by factor">
+    {%- for seg in d.segments -%}
+      <span class="dna-seg{% if seg.points <= 0 %} is-empty{% endif %}" style="flex-grow: {{ seg.cap }}" title="{{ seg.title }}"><i style="width: {{ seg.fill }}%"></i></span>
+    {%- endfor -%}
+    {%- if d.penalty -%}<span class="dna-pen" style="flex-grow: {{ -d.penalty.points }}" title="{{ d.penalty.title }}"></span>{%- endif -%}
+  </span>
+  {%- else -%}
+  <span class="dna dna-none meta subtle">Not scored</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro dna_head(groups) -%}
+  <span class="dna dna-head" aria-hidden="true">
+    {%- for name, cap in groups -%}<span class="dna-group" style="flex-grow: {{ cap }}">{{ name }}</span>{%- endfor -%}
+  </span>
+{%- endmacro %}
+
 {% macro lead_row(l) -%}
 <li>
   <a class="lead-row{% if l.insight_status == 'needs_review' %} is-review{% endif %}" href="/leads/{{ l.gaf_id }}">
@@ -40,11 +59,14 @@
         <span class="lead-summary pending">Insight pending</span>
       {%- endif %}
     </span>
-    <span class="lead-tags">
-      {{ pc_stars(l.presidents_club_stars) }}
-      {% if l.commercial %}<span class="chip">Commercial</span>{% endif %}
-      {% if l.insight_status == "needs_review" %}<span class="chip chip-warn">Needs review</span>{% endif %}
-      {{ play_tag(l.play) }}
+    <span class="lead-explain">
+      {{ dna(l.dna) }}
+      <span class="lead-tags">
+        {{ play_tag(l.play) }}
+        {{ pc_stars(l.presidents_club_stars) }}
+        {% if l.commercial %}<span class="chip">Commercial</span>{% endif %}
+        {% if l.insight_status == "needs_review" %}<span class="chip chip-warn">Needs review</span>{% endif %}
+      </span>
     </span>
     <span class="lead-score">{{ score_badge(l.score) }}</span>
   </a>

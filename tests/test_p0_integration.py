@@ -252,3 +252,21 @@ def test_insights_never_name_unverified_people(leads_db):
         sig = leads_db.get(ContractorSignals, ins.gaf_id)
         people = {p.name for p in load(sig.data).people} if sig else set()
         assert {dm["name"] for dm in ins.data.get("decision_makers", [])} <= people, ins.gaf_id
+
+
+@pytest.mark.db
+def test_score_dna_strip_matches_each_score(client, leads_db):
+    """The list's strip is the score, drawn: segment caps add to 100 and points add to the total."""
+    from html import escape
+
+    from app.web.data import DNA_GROUPS
+
+    html = client.get("/").text
+    assert html.count('class="dna"') == 85
+    assert all(escape(name) in html for name, _ in DNA_GROUPS)  # the page escapes "&"
+    assert sum(cap for _, cap in DNA_GROUPS) == 100
+    for row in list_leads(leads_db, Filters()):
+        segs = row["dna"]["segments"]
+        assert sum(s["cap"] for s in segs) == 100 and all(0 <= s["fill"] <= 100 for s in segs)
+        penalty = row["dna"]["penalty"]["points"] if row["dna"]["penalty"] else 0
+        assert abs(sum(s["points"] for s in segs) + penalty - row["score"]) < 0.11, row["gaf_id"]

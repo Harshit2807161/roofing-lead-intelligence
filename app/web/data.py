@@ -30,6 +30,15 @@ SORTS = {
     "reviews": "Review count",
 }
 PENALTY_SCALE = 10.0  # points; the width reference for negative factors
+# Score DNA strip: one segment per score factor, in scoring order, sized by the factor's cap.
+DNA_FACTORS = [
+    ("presidents_club", "Pres. Club", 20), ("review_volume", "Volume", 18), ("rating", "Rep.", 10),
+    ("activity", "Recent", 10), ("commercial", "Comm.", 12), ("specialties", "Spec.", 6),
+    ("multi_trade", "Trades", 8), ("established", "Est.", 6), ("named_contact", "Contact", 4),
+    ("proximity", "Prox.", 6),
+]  # fmt: skip
+# Header groups over the strip; caps add up to the same 100 as the segments beneath them.
+DNA_GROUPS = [("GAF award", 20), ("Reputation & activity", 38), ("Business fit", 42)]
 _SKIP_WORDS = {"the", "and", "&", "of", "inc", "inc.", "llc", "llc.", "co", "co.", "corp", "corp."}
 
 
@@ -119,6 +128,32 @@ def _lead_query(f: Filters) -> Select:
     return stmt.order_by(*order)
 
 
+def dna_strip(factors: list[dict] | None) -> dict[str, Any] | None:
+    """Segments for the list's score strip: fill = points / cap; complaints as a red tail."""
+    if not factors:
+        return None
+    by_key = {f["key"]: f for f in factors}
+    segments = []
+    for key, short, cap in DNA_FACTORS:
+        f = by_key.get(key, {})
+        points = float(f.get("points") or 0)
+        segments.append({
+            "short": short, "cap": cap, "points": points,
+            "fill": round(max(0.0, min(1.0, points / cap)) * 100, 1),
+            "title": f"{f.get('label', short)}: {points:g}/{cap} · {f.get('reason', '')}",
+        })  # fmt: skip
+    penalty = by_key.get("complaints")
+    return {
+        "segments": segments,
+        "penalty": {
+            "points": penalty["points"],
+            "title": f"Complaints {penalty['points']:g} · {penalty['reason']}",
+        }
+        if penalty
+        else None,
+    }
+
+
 def lead_row(c: Contractor, s: LeadScore | None, i: LeadInsight | None) -> dict[str, Any]:
     """The fields one row of the ranked list needs (also the /api/leads item shape)."""
     return {
@@ -141,6 +176,7 @@ def lead_row(c: Contractor, s: LeadScore | None, i: LeadInsight | None) -> dict[
         "ranked_by": "score" if s else "gaf",
         "score": s.total if s else None,
         "play": s.play if s else None,
+        "dna": dna_strip(s.factors) if s else None,
         "insight_status": i.status if i else None,
         "summary": (i.data or {}).get("summary") if i else None,
     }
