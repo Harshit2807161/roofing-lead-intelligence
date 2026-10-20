@@ -167,3 +167,21 @@ class LeadInsight(Base):
     validation_errors: Mapped[list] = mapped_column(JsonList, default=list)
     attempts: Mapped[int] = mapped_column(Integer, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class SignalCategory(Base):
+    """An open-ended signal category the extractor proposed. 'promoted' once enough contractors
+    share it (signal_promotion_min_contractors); until then a 'candidate'."""
+
+    __tablename__ = "signal_categories"
+
+    name: Mapped[str] = mapped_column(String(48), primary_key=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String(20))  # promoted | candidate
+    contractor_count: Mapped[int] = mapped_column(Integer)
+    gaf_ids: Mapped[list] = mapped_column(JsonList, default=list)
+    raw_labels: Mapped[list] = mapped_column(JsonList, default=list)  # labels merged into this one
+    examples: Mapped[list] = mapped_column(JsonList, default=list)  # a few verbatim quotes
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )

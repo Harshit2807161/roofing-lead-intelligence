@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     small_model: str = "gpt-6-luna"
     model: str = "gpt-6.1-sol"
     llm_concurrency: int = 8
+    # An open-ended signal category becomes first-class once this many contractors share it.
+    signal_promotion_min_contractors: int = 10
 
     # Profile fetching: one page at a time, with a pause, so we stay polite and unblocked.
     fetch_delay_s: float = 1.5
