@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.web import data
+from app.web.chat_pages import chat_context
 from app.web.deps import get_session, templates
 
 router = APIRouter()
@@ -53,7 +54,7 @@ def lead_page(request: Request, gaf_id: str, session: SessionDep) -> HTMLRespons
             request, "not_found.html", {"gaf_id": gaf_id}, status_code=404
         )
     ctx = {"lead": lead, "center": _center(), "statuses": data.LEAD_STATUSES,
-           "reasons": data.FEEDBACK_REASONS}  # fmt: skip
+           "reasons": data.FEEDBACK_REASONS} | chat_context(session, [], gaf_id)  # fmt: skip
     return templates.TemplateResponse(request, "detail.html", ctx)
 
 

@@ -82,7 +82,9 @@ class OpenAIChatModel:
         }
         started = time.perf_counter()
         try:
-            resp = client().responses.create(
+            # A rep is waiting: fail fast (40 s, one retry) rather than the batch job's 90 s and three.
+            chat_client = client().with_options(timeout=40, max_retries=1)
+            resp = chat_client.responses.create(
                 model=self.model, reasoning={"effort": self.effort}, **kwargs
             )
             span.update(

@@ -1,0 +1,37 @@
+{# F8 chat box. Stateless: the form carries the last turns back; answers' citations become chips. #}
+<div class="chat card section-card" id="chat-box" aria-live="polite">
+  <div class="chat-head">
+    <h2 class="h3">{% if lead_name %}Ask about this lead{% else %}Ask about the territory{% endif %}</h2>
+    <span class="meta subtle">Answers come only from our stored data, with sources</span>
+  </div>
+  {% if thread %}
+  <ol class="chat-thread">
+    {% for m in thread %}<li class="msg msg-{{ m.role }}">{{ m.html }}</li>{% endfor %}
+  </ol>
+  {% endif %}
+  {% if last %}
+  <p class="chat-trace meta subtle">
+    Tools: {{ last.tools | join(", ") or "none" }} · {{ last.steps }} model call{{ "s" if last.steps != 1 }}{% if last.stop != "answer" %} · stopped at {{ last.stop | replace("_", " ") }}{% endif %}{% if last.retried %} · citations repaired once{% endif %}
+    {% if last.unverified %}<span class="warn"> · unverified: {{ last.unverified | join(", ") }}</span>{% endif %}
+  </p>
+  {% endif %}
+  <form class="chat-form" hx-post="/chat/messages" hx-target="#chat-box" hx-swap="outerHTML" hx-disabled-elt="find button">
+    <input type="hidden" name="history" value="{{ history_json }}">
+    <input type="hidden" name="gaf_id" value="{{ gaf_id or '' }}">
+    <input type="text" name="message" required maxlength="1000" autocomplete="off"
+           placeholder="{% if lead_name %}Ask about {{ lead_name }}…{% else %}e.g. Which NJ contractors do siding and gutters?{% endif %}">
+    <button class="btn btn-primary btn-small" type="submit">Ask</button>
+    <span class="chat-wait meta subtle">Reading the data…</span>
+  </form>
+  {% if not thread %}
+  <div class="chat-suggest">
+    {% for s in suggestions %}
+    <form hx-post="/chat/messages" hx-target="#chat-box" hx-swap="outerHTML">
+      <input type="hidden" name="history" value="[]"><input type="hidden" name="gaf_id" value="{{ gaf_id or '' }}">
+      <input type="hidden" name="message" value="{{ s }}">
+      <button class="sig sig-contact" type="submit">{{ s }}</button>
+    </form>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
