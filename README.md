@@ -36,7 +36,7 @@ uv run ruff check app tests
 |---|---|
 | `app/ingest/` | `fetch` (API + Chrome), `parse` (pure functions), `load` (dedupe, upsert), `run` (CLI) |
 | `app/intel/` | `extract`, `discover`, `score`, `insight`, `llm` (one wrapper, JSONL traces), `run` |
-| `app/web/`, `app/templates/`, `app/static/` | Rep UI; InstaLILY tokens in `app/static/tokens.css`, style card at `/style` |
+| `app/web/`, `app/templates/`, `app/static/` | Rep UI; design tokens in `app/static/tokens.css`, style card at `/style` |
 | `app/models.py` | runs, raw_snapshots, contractors, reviews, signals, signal_categories, scores, insights |
 | `REQUIREMENTS.md`, `DATA-EXPLORATION.md`, `ARCHITECTURE-OPTIONS.md` | Scope, what the source gives us, options considered and why |
 

@@ -1,7 +1,6 @@
 /*
-  Design tokens for the rep UI, lifted from instalily.ai's own stylesheets (saved homepage and
-  InstaProspect pages, Oct 2026). Three layers: primitive (raw brand values, same names as the
-  site's --brand-* variables) -> semantic (what a value is for) -> component (one component's knobs).
+  Design tokens for the rep UI. Three layers: primitive (raw brand values, the --brand-*
+  variables) -> semantic (what a value is for) -> component (one component's knobs).
   Components read semantic or component tokens only, never primitives or raw hex.
 */
 
@@ -32,7 +31,7 @@
   --brand-hover: #f0f3ee;
   --brand-selected: #eaefea;
 
-  /* The one accent: InstaLILY green, with sage as its soft partner. */
+  /* The one accent: a deep green, with sage as its soft partner. */
   --brand-green: #2e6b45;
   --brand-green-deep: #193a29;
   --brand-green-12: #2e6b451f;
@@ -175,7 +174,7 @@
   --card-radius: var(--r-card);
   --card-pad: clamp(18px, 1.8vw, 26px);
 
-  /* InstaProspect lead row: rank, ink initials tile, name + sub line, green score pill. */
+  /* Lead row: rank, ink initials tile, name + sub line, green score pill. */
   --row-hover: var(--bg-hover);
   --row-border: var(--border-soft);
   --avatar-bg: var(--bg-inverse);
