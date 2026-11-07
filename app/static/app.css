@@ -170,7 +170,7 @@ input[type="search"]:focus, select:focus { border-color: var(--accent); outline:
 .results-head { display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px 8px; }
 .lead-results.htmx-request { opacity: 0.55; transition: opacity var(--dur-2) var(--ease-out); }
 
-/* InstaProspect inbox row: rank | initials tile | name + sub | tags | score pill */
+/* Lead inbox row: rank | initials tile | name + sub | tags | score pill */
 .lead-list { list-style: none; margin: 0; padding: 6px; }
 .lead-list-flat { padding: 0; }
 .lead-row {

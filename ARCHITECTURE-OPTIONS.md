@@ -47,8 +47,8 @@ Inputs, all in code:
 ## 3. Rep UI stack (open)
 | | U1 · FastAPI + Jinja + HTMX | U2 · React (Vite) + FastAPI API | U3 · Streamlit |
 |---|---|---|---|
-| Strength | One process; server-rendered; InstaLILY CSS tokens drop straight in; filters and detail panes via HTMX | Richest interaction (map, live filters, chat panel) | Fastest data app |
-| Weakness | Less app-like; complex client state is awkward | A second build and toolchain; ~1 h more | Can't match InstaLILY's look, which fails the style requirement |
+| Strength | One process; server-rendered; the CSS design tokens drop straight in; filters and detail panes via HTMX | Richest interaction (map, live filters, chat panel) | Fastest data app |
+| Weakness | Less app-like; complex client state is awkward | A second build and toolchain; ~1 h more | Can't apply the design tokens, which fails the style requirement |
 | Fits F6 + P1 chat | Yes; the chat streams over SSE | Yes | Weak |
 
 **My pick: U1.** It's the shortest path to a styled, polished list and detail page. A Leaflet map from the latitude and longitude is a cheap distinctive feature. Switch to U2 only if the chat or map needs more client state than HTMX handles cleanly.
