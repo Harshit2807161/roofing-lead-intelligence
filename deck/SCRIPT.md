@@ -8,7 +8,7 @@ Open `deck/index.html` (→ / space to advance, ← back). Have `http://localhos
 "I built a lead-intelligence tool for a roofing distributor's sales reps, from GAF's public contractor directory. One idea runs through all of it: every lead is ranked, and every reason behind the rank is something a rep can check."
 
 ## 2 · The job (40 s)
-"Before a call, a rep needs four answers: who to call first, why them, who to ask for, and what to say. And they need to trust those answers. InstaLILY's own targeting-list work shows that reps ignore a list that says who without saying why. So success for me meant three things: every lead scored and explained, every claim traceable to a source, and about a cent per lead, computed ahead of time so reps only read."
+"Before a call, a rep needs four answers: who to call first, why them, who to ask for, and what to say. And they need to trust those answers. Reps ignore a list that says who without saying why. So success for me meant three things: every lead scored and explained, every claim traceable to a source, and about a cent per lead, computed ahead of time so reps only read."
 
 ## 3 · The data (60 s)
 "I explored the source before designing anything, and it changed the design.
@@ -28,7 +28,7 @@ One more thing: the extractor can propose new signal categories. When ten or mor
 In one line: the LLM proposes, code disposes."
 
 ## 5 · Options (40 s)
-"I compared three shapes. A writes on top of a code score: simplest, but the rank can't see the text. C sends an agent to research the top leads on the web: real owner names, but it leaves the data we were given and is hard to test. I chose B. The LLM reads the text, code ranks, and the LLM writes last. That's the same order as InstaProspect: signals in, rules score, the opening written last. I rejected letting a model score leads directly, because it's unstable and nobody can say why #3 beat #4."
+"I compared three shapes. A writes on top of a code score: simplest, but the rank can't see the text. C sends an agent to research the top leads on the web: real owner names, but it leaves the data we were given and is hard to test. I chose B. The LLM reads the text, code ranks, and the LLM writes last. Signals in, rules score, the opening written last. I rejected letting a model score leads directly, because it's unstable and nobody can say why #3 beat #4."
 
 ## 6 · Trust (40 s)
 "Three checks, all in code.

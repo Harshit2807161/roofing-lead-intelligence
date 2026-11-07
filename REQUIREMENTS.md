@@ -30,15 +30,15 @@ A roofing **distributor** (think SRS, ABC Supply, Beacon) sells shingles and mat
 | F3 | **Normalize, dedupe and store:** dedupe on the GAF contractor ID; store contractors, reviews, raw snapshots, scores and insights in one database; keep the source URL for each field |
 | F4 | **Lead score:** a deterministic, explainable score in code, with a per-factor breakdown the UI can show. Inputs: President's Club stars, commercial certifications, specialties, rating (adjusted for review count), review volume, newest review date, years in business and employees where shown, and GAF's distance, plus the LLM-extracted signals from step B. The weights live in code |
 | F5 | **AI insights per lead** (structured output, grounded): a summary, why it's a fit, signals, likely decision-maker(s) with source, talking points, recommended next action. Every claim cites a field or review. Output is schema-validated, and a decision-maker appears only with a cited source (no invented people or contacts) |
-| F6 | **Rep UI:** a ranked lead list with filters (tier, distance, rating, score), and a lead detail page with the score breakdown, insights, signals and source links. **Styled like an InstaLILY product** (next section) |
+| F6 | **Rep UI:** a ranked lead list with filters (tier, distance, rating, score), and a lead detail page with the score breakdown, insights, signals and source links. **Styled with one consistent design system** (next section) |
 | F7 | **API:** `GET /leads`, `GET /leads/{id}`, `POST /pipeline/runs` (runs the configured search, no ZIP parameter) with run status |
 
 ## Rep UI style (part of F6)
-- The UI should look like it came from InstaLILY: their fonts, colours, spacing and card style.
-- **Before any UI code:** pull InstaLILY's style from instalily.ai with the `brand` skill (palette and type), turn it into CSS variables with the `design-system` skill, and render a one-page style card to check before building screens. If the live site blocks us, use the saved pages in `onsite-prep/offline/reading/instalily/`.
-- First look at the saved homepage and InstaProspect pages: **DM Mono** for body and labels plus a separate display face, near-black text on warm off-white (`#0a0a0a`, `#f2f3ec`).
+- The UI should look like a finished product: one set of fonts, colours, spacing and card styles.
+- **Before any UI code:** define the palette and type as CSS variables with the `design-system` skill, and render a one-page style card to check before building screens.
+- **Type and colour:** **DM Mono** for body and labels plus a separate display face, near-black text on warm off-white (`#0a0a0a`, `#f2f3ec`).
 - **Score DNA strip (built):** every list row shows its score as ten segments, one per factor, sized by the factor's cap and filled by points earned, with complaints as a red tail. Hover a segment for the factor and reason. Filters sit in a toolbar above the list so rows keep the full width.
-- **Layout precedent:** InstaProspect's ranked lead list (rank, initials, owner, rating, estimated value, score) is InstaLILY's own UI for this exact job.
+- **Layout:** a ranked lead list (rank, initials, owner, rating, estimated value, score), the usual shape for sales-lead tools.
 
 ## P1 (only after P0 runs end to end; P0 checked on 20 Oct: F1–F6 met, F7's run trigger deferred)
 | ID | Requirement |
