@@ -1,0 +1,32 @@
+{# F9: the rep's status and notes for this lead. Every button appends a row; history is kept. #}
+<section class="card section-card workflow-card" id="workflow-card" aria-labelledby="workflow-h">
+  <div class="workflow-head">
+    <h2 class="h3" id="workflow-h">Your workflow</h2>
+    <span class="status-chip status-{{ lead.workflow.status }}">{{ lead.workflow.status_label }}</span>
+  </div>
+  <form class="status-buttons" hx-post="/leads/{{ lead.gaf_id }}/activity" hx-target="#workflow-card" hx-swap="outerHTML">
+    {% for key, label in statuses.items() %}
+    <button class="btn btn-small{% if lead.workflow.status == key %} is-active{% endif %}" type="submit" name="status" value="{{ key }}" {% if lead.workflow.status == key %}aria-pressed="true"{% endif %}>{{ label }}</button>
+    {% endfor %}
+  </form>
+  <form class="note-form" hx-post="/leads/{{ lead.gaf_id }}/activity" hx-target="#workflow-card" hx-swap="outerHTML">
+    <label class="field">
+      <span class="label">Add a note</span>
+      <textarea name="note" rows="2" maxlength="2000" required placeholder="e.g. Spoke to Jonathan; call back Thursday about gutters"></textarea>
+    </label>
+    <button class="btn btn-secondary btn-small" type="submit">Save note</button>
+  </form>
+  {% if lead.workflow.history %}
+  <ol class="activity">
+    {% for a in lead.workflow.history[:8] %}
+    <li>
+      <span class="meta subtle">{{ a.created_at | date("%b %-d, %H:%M") }}</span>
+      {% if a.status_label %}<span class="status-chip status-{{ a.status }}">{{ a.status_label }}</span>{% endif %}
+      {% if a.note %}<span class="activity-note">{{ a.note }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="meta subtle">No activity yet, so this lead is new.</p>
+  {% endif %}
+</section>

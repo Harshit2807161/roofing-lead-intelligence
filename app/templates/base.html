@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/tokens.css">
   <link rel="stylesheet" href="/static/app.css">
   <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+  <script src="/static/chat.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -23,6 +24,9 @@
       </a>
       <nav class="topnav" aria-label="Main">
         <a href="/" {% if active == "leads" %}aria-current="page"{% endif %}>Leads</a>
+        <a href="/chat" {% if active == "chat" %}aria-current="page"{% endif %}>Chat</a>
+        <a href="/compare" {% if active == "compare" %}aria-current="page"{% endif %}>Compare</a>
+        <a href="/tuner" {% if active == "tuner" %}aria-current="page"{% endif %}>Tuner</a>
         <a href="/style" {% if active == "style" %}aria-current="page"{% endif %}>Style</a>
         <a href="/docs">API</a>
       </nav>

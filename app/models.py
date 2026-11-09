@@ -185,3 +185,36 @@ class SignalCategory(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+# --- P1: the rep's own data. Append-only, so history and votes are never overwritten. ---
+
+
+class LeadActivity(Base):
+    """A status change or note on a lead (F9). The current status is the latest status row."""
+
+    __tablename__ = "lead_activity"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    gaf_id: Mapped[str] = mapped_column(ForeignKey("contractors.gaf_id"), index=True)
+    status: Mapped[str | None] = mapped_column(String(20))  # new | contacted | not_a_fit
+    note: Mapped[str | None] = mapped_column(Text)
+    actor: Mapped[str] = mapped_column(String(60), default="rep")  # one rep until auth lands
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class InsightFeedback(Base):
+    """A rep's vote on an insight (F12), tied to the prompt version and inputs that produced it,
+    so a downvote points at a specific prompt and becomes a labelled eval case."""
+
+    __tablename__ = "insight_feedback"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    gaf_id: Mapped[str] = mapped_column(ForeignKey("contractors.gaf_id"), index=True)
+    vote: Mapped[int] = mapped_column(Integer)  # +1 useful, -1 not useful
+    reason: Mapped[str | None] = mapped_column(String(60))
+    model: Mapped[str] = mapped_column(String(60))
+    prompt_version: Mapped[str] = mapped_column(String(20))
+    input_hash: Mapped[str] = mapped_column(String(64))
+    actor: Mapped[str] = mapped_column(String(60), default="rep")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

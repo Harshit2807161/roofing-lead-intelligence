@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% set active = "chat" %}
+{% block title %}Prep chat · Roofing Leads{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <span class="eyebrow"><span class="pip" aria-hidden="true"></span>Prep chat</span>
+    <h1 class="h1">Ask about your territory</h1>
+    <p class="lead muted">Questions across all 85 leads, answered from the stored GAF data, scores, insights and your notes. Every fact links to its source.</p>
+  </div>
+</section>
+{% include "partials/chat_box.html" %}
+{% endblock %}

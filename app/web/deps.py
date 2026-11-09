@@ -20,7 +20,7 @@ def _sessions() -> sessionmaker[Session]:
 
 
 def get_session() -> Iterator[Session]:
-    """One short read session per request; the UI never writes."""
+    """One short session per request. Pages only read; app/web/actions.py holds the few writes."""
     with _sessions()() as session:
         yield session
 

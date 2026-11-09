@@ -1,0 +1,287 @@
+{
+ "schema_version": 1,
+ "diagram_type": "dataflow",
+ "meta": {
+  "title": "Roofing lead intelligence: data flow",
+  "output": ".archify/dataflow-lead-pipeline-20261020-133352/lead-pipeline.html",
+  "viewBox": [
+   1320,
+   720
+  ],
+  "quality_profile": "standard",
+  "legend": {
+   "entries": {
+    "emphasis": {
+     "label": "main path"
+    },
+    "security": {
+     "label": "checked in code"
+    },
+    "dashed": {
+     "label": "retry / rep writes"
+    }
+   }
+  }
+ },
+ "stages": [
+  {
+   "label": "Sources"
+  },
+  {
+   "label": "Ingest (code)"
+  },
+  {
+   "label": "Enrich (LLM fenced by code)"
+  },
+  {
+   "label": "Store"
+  },
+  {
+   "label": "Serve"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "gafApi",
+   "type": "external",
+   "label": "GAF search API",
+   "sublabel": "listing JSON",
+   "stage": 0,
+   "row": 0,
+   "tag": "85 leads"
+  },
+  {
+   "id": "gafPages",
+   "type": "external",
+   "label": "GAF profile pages",
+   "sublabel": "headless Chrome",
+   "stage": 0,
+   "row": 2,
+   "tag": "HTML"
+  },
+  {
+   "id": "snapshots",
+   "type": "database",
+   "label": "Raw snapshots",
+   "sublabel": "files + sha256",
+   "stage": 1,
+   "row": 0,
+   "tag": "replayable"
+  },
+  {
+   "id": "parse",
+   "type": "backend",
+   "label": "Parse + dedupe",
+   "sublabel": "pure functions",
+   "stage": 1,
+   "row": 1,
+   "tag": "upsert GAF ID"
+  },
+  {
+   "id": "facts",
+   "type": "database",
+   "label": "Postgres: facts",
+   "sublabel": "facts + reviews",
+   "stage": 1,
+   "row": 2,
+   "tag": "typed"
+  },
+  {
+   "id": "extract",
+   "type": "cloud",
+   "label": "Extract signals",
+   "sublabel": "gpt-6-luna",
+   "stage": 2,
+   "row": 0,
+   "tag": "quotes"
+  },
+  {
+   "id": "score",
+   "type": "backend",
+   "label": "Score",
+   "sublabel": "weighted points",
+   "stage": 2,
+   "row": 1,
+   "tag": "code"
+  },
+  {
+   "id": "write",
+   "type": "cloud",
+   "label": "Write insight",
+   "sublabel": "gpt-6.1-sol",
+   "stage": 2,
+   "row": 2,
+   "tag": "cites facts"
+  },
+  {
+   "id": "validate",
+   "type": "security",
+   "label": "Validate",
+   "sublabel": "cites \u00b7 people",
+   "stage": 2,
+   "row": 3,
+   "tag": "1 retry"
+  },
+  {
+   "id": "intel",
+   "type": "database",
+   "label": "Postgres: intel",
+   "sublabel": "scores \u00b7 insights",
+   "stage": 3,
+   "row": 1,
+   "tag": "precomputed"
+  },
+  {
+   "id": "repData",
+   "type": "database",
+   "label": "Postgres: rep data",
+   "sublabel": "status \u00b7 votes",
+   "stage": 4,
+   "row": 2,
+   "tag": "append-only"
+  },
+  {
+   "id": "ui",
+   "type": "frontend",
+   "label": "Rep UI + API",
+   "sublabel": "pages + JSON API",
+   "stage": 4,
+   "row": 1,
+   "tag": "HTMX"
+  },
+  {
+   "id": "chat",
+   "type": "backend",
+   "label": "Prep chat agent",
+   "sublabel": "read-only tools",
+   "stage": 4,
+   "row": 0,
+   "tag": "budgets"
+  }
+ ],
+ "flows": [
+  {
+   "id": "listing",
+   "from": "gafApi",
+   "to": "snapshots",
+   "label": "listing JSON",
+   "variant": "emphasis",
+   "route": "straight"
+  },
+  {
+   "id": "pages",
+   "from": "gafPages",
+   "to": "snapshots",
+   "label": "raw HTML",
+   "variant": "emphasis"
+  },
+  {
+   "id": "reparse",
+   "from": "snapshots",
+   "to": "parse",
+   "label": "re-parse offline",
+   "variant": "default",
+   "labelAt": [
+    262.0,
+    214.0
+   ]
+  },
+  {
+   "id": "load",
+   "from": "parse",
+   "to": "facts",
+   "label": "typed records",
+   "variant": "emphasis",
+   "labelAt": [
+    377.0,
+    315.0
+   ]
+  },
+  {
+   "id": "text",
+   "from": "facts",
+   "to": "extract",
+   "label": "About + 3 reviews",
+   "variant": "emphasis"
+  },
+  {
+   "id": "signals",
+   "from": "extract",
+   "to": "score",
+   "label": "verified signals",
+   "classification": "verbatim check",
+   "variant": "security",
+   "labelAt": [
+    592.0,
+    201.0
+   ]
+  },
+  {
+   "id": "breakdown",
+   "from": "score",
+   "to": "write",
+   "label": "score + reasons",
+   "variant": "emphasis",
+   "labelAt": [
+    583.0,
+    315.0
+   ]
+  },
+  {
+   "id": "draft",
+   "from": "write",
+   "to": "validate",
+   "label": "insight JSON",
+   "variant": "emphasis",
+   "labelAt": [
+    592.0,
+    429.0
+   ]
+  },
+  {
+   "id": "stored",
+   "from": "validate",
+   "to": "intel",
+   "label": "ok or needs_review",
+   "variant": "security"
+  },
+  {
+   "id": "scores",
+   "from": "score",
+   "to": "intel",
+   "label": "scores",
+   "variant": "default",
+   "route": "straight"
+  },
+  {
+   "id": "reads",
+   "from": "intel",
+   "to": "ui",
+   "label": "precomputed rows",
+   "variant": "emphasis",
+   "route": "straight",
+   "labelAt": [
+    852.0,
+    291.0
+   ]
+  },
+  {
+   "id": "tools",
+   "from": "intel",
+   "to": "chat",
+   "label": "read-only tools",
+   "variant": "default"
+  },
+  {
+   "id": "repWrites",
+   "from": "ui",
+   "to": "repData",
+   "label": "status, votes",
+   "variant": "dashed",
+   "labelAt": [
+    1022.0,
+    315.0
+   ]
+  }
+ ]
+}

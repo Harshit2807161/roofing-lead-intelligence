@@ -108,11 +108,15 @@
           {% endif %}
         </div>
       {% endif %}
+      {% if lead.insight %}{% include "partials/feedback.html" %}{% endif %}
     </section>
+
+    {% include "partials/chat_box.html" %}
 
     <section class="card section-card" aria-labelledby="score-h">
       <div class="section-head">
         <h2 class="h3" id="score-h">Score breakdown</h2>
+        <a class="link-quiet meta" href="/compare?a={{ lead.gaf_id }}">Compare with the next lead →</a>
         {% if lead.score_detail %}<span class="meta subtle">{{ lead.score_detail.total | num }} of 100 points</span>{% endif %}
       </div>
       {% if lead.score_detail %}
@@ -148,6 +152,7 @@
   </div>
 
   <aside class="side-col">
+    {% include "partials/workflow_card.html" %}
     <section class="card section-card map-card">
       <div id="detail-map" class="mini-map" data-lat="{{ lead.lat }}" data-lng="{{ lead.lng }}" data-name="{{ lead.name }}" data-center="{{ center | tojson | forceescape }}"></div>
       <p class="meta subtle">{{ lead.distance_mi | num }} mi from ZIP 10013</p>

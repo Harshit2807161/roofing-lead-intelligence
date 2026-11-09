@@ -21,3 +21,6 @@ data/
 
 # LLM traces (contain contractor data; local only)
 traces/
+
+# Archify working folders (the delivered diagram is copied into deck/)
+.archify/

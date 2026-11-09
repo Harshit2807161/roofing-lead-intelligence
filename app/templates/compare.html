@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% from "macros.html" import score_badge %}
+{% set active = "compare" %}
+{% block title %}{{ A.short }} vs {{ B.short }} · Roofing Leads{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/explain.css">{% endblock %}
+
+{% macro vs_lead(l, side) -%}
+<div class="vs-lead {{ side }}">
+  <span class="avatar" aria-hidden="true">{{ l.initials }}</span>
+  <span class="lead-meta">
+    <span class="eyebrow">{{ "A" if side == "left" else "B" }} · Rank {{ l.rank }}{% if l.play %} · {{ l.play }}{% endif %}</span>
+    <a class="lead-name" href="/leads/{{ l.gaf_id }}">{{ l.name }}</a>
+    <span class="lead-sub">{{ l.city }}, {{ l.state }} · {{ l.distance_mi | num }} mi · {% if l.presidents_club_stars %}{{ l.presidents_club_stars }}★ President's Club{% else %}No President's Club{% endif %}</span>
+  </span>
+  {{ score_badge(l.score, "score-lg") }}
+</div>
+{%- endmacro %}
+
+{% macro pop(label, max, a_pts, b_pts, a_why, b_why) -%}
+<span class="cite-pop dv-pop" role="tooltip">
+  <span class="cite-pop-label">{{ label }}{% if max %} · max {{ max | num }}{% endif %}</span>
+  <span class="dv-pop-line"><b>{{ A.short }}</b> {{ a_pts | num }}{% if max %}/{{ max | num }}{% endif %}{% if a_why %} · {{ a_why }}{% endif %}</span>
+  <span class="dv-pop-line"><b>{{ B.short }}</b> {{ b_pts | num }}{% if max %}/{{ max | num }}{% endif %}{% if b_why %} · {{ b_why }}{% endif %}</span>
+</span>
+{%- endmacro %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <span class="eyebrow"><span class="pip" aria-hidden="true"></span>Head-to-head</span>
+    <h1 class="h1">Why one lead outranks another</h1>
+    <p class="lead muted">Pick any two leads to see the score gap factor by factor. Same score-v1 points as each lead's detail page; hover a row for both sides' reasons.</p>
+  </div>
+</section>
+
+<div id="cmp" class="cmp" hx-target="#cmp" hx-select="#cmp" hx-swap="outerHTML" hx-push-url="true">
+  <form class="card cmp-pick" action="/compare" method="get" hx-get="/compare" hx-trigger="change">
+    <label class="field">
+      <span class="label">Lead A</span>
+      <select name="a">
+        {% for l in leads %}<option value="{{ l.gaf_id }}"{% if l.gaf_id == A.gaf_id %} selected{% endif %}>#{{ l.rank }} {{ l.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <a class="btn btn-secondary btn-sm cmp-swap" href="/compare?a={{ B.gaf_id }}&amp;b={{ A.gaf_id }}" hx-get="/compare?a={{ B.gaf_id }}&amp;b={{ A.gaf_id }}" title="Swap A and B">⇄ Swap</a>
+    <label class="field">
+      <span class="label">Lead B</span>
+      <select name="b">
+        {% for l in leads %}<option value="{{ l.gaf_id }}"{% if l.gaf_id == B.gaf_id %} selected{% endif %}>#{{ l.rank }} {{ l.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <noscript><button class="btn btn-primary btn-sm" type="submit">Compare</button></noscript>
+  </form>
+
+  <section class="card section-card cmp-card" aria-label="Comparison">
+    <div class="vs-head">
+      {{ vs_lead(A, "left") }}
+      <span class="vs-mid">vs</span>
+      {{ vs_lead(B, "right") }}
+    </div>
+
+    <p class="vs-summary">{{ cmp.verdict }}</p>
+
+    <div class="dv">
+      <div class="dv-row dv-axis" aria-hidden="true">
+        <span class="label">Factor</span>
+        <span class="dv-side l">◀ <span class="dv-full">{{ A.short }}</span><span class="dv-abbr">A</span> ahead</span>
+        <span class="dv-side r"><span class="dv-full">{{ B.short }}</span><span class="dv-abbr">B</span> ahead ▶</span>
+        <span class="dv-raw">A vs B</span>
+      </div>
+      {% for r in cmp.rows %}{% set g = r.g %}
+      <div class="dv-row" tabindex="0">
+        <span class="dv-label">{{ g.label }}</span>
+        <span class="dv-side l">{% if g.diff > 0 %}<span class="dv-num">+{{ r.abs | num }}</span><span class="dv-bar" style="width: {{ r.pct }}%"></span>{% endif %}</span>
+        <span class="dv-side r">{% if g.diff < 0 %}<span class="dv-bar" style="width: {{ r.pct }}%"></span><span class="dv-num">+{{ r.abs | num }}</span>{% endif %}</span>
+        <span class="dv-raw">{{ g.a | num }} vs {{ g.b | num }}</span>
+        {{ pop(g.label, g.max, g.a, g.b, g.reason_a, g.reason_b) }}
+      </div>
+      {% endfor %}
+      {% if cmp.tied %}
+      <p class="dv-tied"><span class="label">Tied</span> {% for g in cmp.tied %}{{ g.label }} ({{ g.a | num }}){% if not loop.last %} · {% endif %}{% endfor %}</p>
+      {% endif %}
+      <div class="dv-row dv-total" tabindex="0">
+        <span class="dv-label">Total gap</span>
+        <span class="dv-side l">{% if cmp.gap > 0 %}<span class="dv-num">+{{ cmp.gap_abs | num }}</span><span class="dv-bar" style="width: {{ cmp.gap_pct }}%"></span>{% endif %}</span>
+        <span class="dv-side r">{% if cmp.gap < 0 %}<span class="dv-bar" style="width: {{ cmp.gap_pct }}%"></span><span class="dv-num">+{{ cmp.gap_abs | num }}</span>{% elif cmp.gap == 0 %}<span class="dv-num subtle">Tied</span>{% endif %}</span>
+        <span class="dv-raw">{{ A.score | num }} vs {{ B.score | num }}</span>
+        {{ pop("Lead score", 100, A.score or 0, B.score or 0, "", "") }}
+      </div>
+    </div>
+
+    <p class="meta subtle cmp-foot">Bars show the points one lead has over the other on each factor, widest gap first. <a href="/leads/{{ A.gaf_id }}">{{ A.short }} details</a> · <a href="/leads/{{ B.gaf_id }}">{{ B.short }} details</a> · <a href="/tuner">Ranking tuner</a></p>
+  </section>
+</div>
+{% endblock %}

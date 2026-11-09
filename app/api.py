@@ -8,7 +8,10 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from app.web import data
+from app.web.actions import router as actions_router
+from app.web.chat_pages import router as chat_router
 from app.web.deps import STATIC_DIR, get_session
+from app.web.explain_pages import router as explain_router
 from app.web.pages import router as pages_router
 
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -52,6 +55,9 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     app.include_router(api)
     app.include_router(pages_router)
+    app.include_router(actions_router)
+    app.include_router(chat_router)
+    app.include_router(explain_router)
     return app
 
 

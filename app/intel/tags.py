@@ -73,7 +73,7 @@ def semantic_tags(data: dict | None, promoted: set[str] | frozenset[str]) -> lis
 def tag_label(key: str) -> str:
     """The filter-menu label for a tag key."""
     if key.startswith("trade:"):
-        return f"Does {TRADES.get(key[6:], key[6:]).lower()}"
+        return TRADES.get(key[6:], key[6:])
     if key.startswith("signal:"):
         return category_label(key[7:])
     return FIXED.get(key, key)
